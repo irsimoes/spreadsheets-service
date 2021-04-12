@@ -31,8 +31,8 @@ public class UsersServer {
 
 		String serverURI = String.format("http://%s:%s/rest", ip, PORT);
 		JdkHttpServerFactory.createHttpServer( URI.create(serverURI), config);
-		Discovery discovery = new Discovery( SERVICE, serverURI);
-		discovery.start();
+		Discovery discovery = Discovery.getInstance();
+		discovery.start(args[0], SERVICE, serverURI);
 	
 		Log.info(String.format("%s Server ready @ %s\n",  SERVICE, serverURI));
 		

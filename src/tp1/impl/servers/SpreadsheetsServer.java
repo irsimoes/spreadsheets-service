@@ -8,7 +8,7 @@ import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 
 import tp1.discovery.Discovery;
-import tp1.impl.servers.rest.UsersResource;
+import tp1.impl.servers.rest.SpreadsheetsResource;
 
 public class SpreadsheetsServer {
 
@@ -25,15 +25,16 @@ public class SpreadsheetsServer {
 	public static void main(String[] args) {
 		try {
 		String ip = InetAddress.getLocalHost().getHostAddress();
-				
-		ResourceConfig config = new ResourceConfig();
-		config.register(UsersResource.class);
 
 		String serverURI = String.format("http://%s:%s/rest", ip, PORT);
-		JdkHttpServerFactory.createHttpServer( URI.create(serverURI), config);
-		Discovery discovery = new Discovery( SERVICE, serverURI);
-		discovery.start();
 		
+		Discovery discovery = Discovery.getInstance();
+		discovery.start(args[0], SERVICE, serverURI);
+		
+		ResourceConfig config = new ResourceConfig();
+		config.register(new SpreadsheetsResource(args[0], discovery));
+		JdkHttpServerFactory.createHttpServer( URI.create(serverURI), config);
+
 		Log.info(String.format("%s Server ready @ %s\n",  SERVICE, serverURI));
 			
 		//More code can be executed here...
