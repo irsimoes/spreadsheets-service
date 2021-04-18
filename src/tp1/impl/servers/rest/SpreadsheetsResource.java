@@ -397,10 +397,13 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 			throw new WebApplicationException( Status.BAD_REQUEST ); //400
 		}
 		
-		for( String id : userSheets.get(userId)) {
-			sheets.remove(id);
+		Set<String> sheetIds = userSheets.get(userId);
+		if(sheetIds != null) {
+			for( String id : sheetIds) {
+				sheets.remove(id);
+			}
+			userSheets.remove(userId);
 		}
-		userSheets.remove(userId);
 	}
 
 	private int requestUser(String userDomain, String userId, String password) {
