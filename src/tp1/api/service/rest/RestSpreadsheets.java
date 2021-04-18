@@ -144,4 +144,23 @@ public interface RestSpreadsheets {
 	@Path("/{sheetId}/share/{userId}")
 	void unshareSpreadsheet( @PathParam("sheetId") String sheetId, @PathParam("userId") String userId, 
 			@QueryParam("password") String password);
+
+	/**
+	 * Retrieves the values of a certain range in a spreadsheet.
+	 * 
+	 * @param userId - The user requesting the values.
+	 * @param sheetId - the spreadsheet whose values are being retrieved.
+	 * @param password - the password of the user.
+	 * @param range - the range of the spreadsheet the user wants to retrieve.
+	 * 
+	 * @return 200, if the operation is successful
+	 * 		   403, if the spreadsheet is not shared with user, or the user is not the owner, or the password is incorrect.
+	 * 		   404, if the spreadsheet or the user do not exist
+	 *		   400, otherwise
+	 */
+	@GET
+	@Path("/{sheetId}/range")
+	@Produces(MediaType.APPLICATION_JSON)
+	String[][] getRange(@PathParam("sheetId") String sheetId, 
+			@QueryParam("userId") String userId, @QueryParam("range") String range);
 }

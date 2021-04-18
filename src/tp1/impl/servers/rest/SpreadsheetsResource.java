@@ -20,6 +20,7 @@ import tp1.api.service.rest.*;
 import tp1.discovery.Discovery;
 import tp1.api.engine.*;
 import tp1.impl.engine.SpreadsheetEngineImpl;
+import tp1.util.CellRange;
 
 @Singleton
 public class SpreadsheetsResource implements RestSpreadsheets {
@@ -68,7 +69,7 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 			sheet.setSheetId(id);
 		
 			String ip = InetAddress.getLocalHost().getHostAddress();
-			String sheetURL = String.format("http://%s:%s/rest/sheets/%s", ip, PORT, id);
+			String sheetURL = String.format("http://%s:%s/rest/spreadsheets/%s", ip, PORT, id);
 			sheet.setSheetURL(sheetURL);
 
 			sheets.put(id, sheet);
@@ -131,7 +132,7 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 	public String[][] getSpreadsheetValues(String sheetId, String userId, String password) {
 		// TODO Auto-generated method stub
 
-		if(sheetId == null || userId == null || password == null) {
+		if(sheetId == null || userId == null /*|| password == null */) {
 			throw new WebApplicationException( Status.BAD_REQUEST ); //400
 		}
 
@@ -175,11 +176,37 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 			}
 			
 			@Override
-				public String[][] getRangeValues(String sheetURL, String range) {
-							// get remote range ...
-					return null;
+			public String[][] getRangeValues(String sheetURL, String range) {
+			String user = String.format("%s@%s", sheet.getOwner(), domain);
+			
+			WebTarget target = client.target(sheetURL).path("/range");
+
+			short retries = 0;
+
+			while(retries < MAX_RETRIES) {
+
+				try {
+					Response r = target.queryParam("userId", user).queryParam("range", range).request()
+					.accept(MediaType.APPLICATION_JSON)
+					.get();
+
+					if( r.getStatus() == Status.OK.getStatusCode() && r.hasEntity() ) {
+						return r.readEntity(String[][].class);
+					} else {
+						throw new WebApplicationException(r.getStatus());
+					}
+
+				} catch (ProcessingException pe) {
+					retries++;
+				try { 
+					Thread.sleep(RETRY_PERIOD);
+				} catch (InterruptedException e) {
 				}
-			});
+			}
+		}
+			return null;		
+		}
+		});
 
 		return values; //200
 	}
@@ -270,6 +297,88 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 		Set<String> sharedWith = sheet.getSharedWith();
 		sharedWith.remove(userId);
 		throw new WebApplicationException( Status.NO_CONTENT); //204
+	}
+
+
+	@Override
+	public String[][] getRange(String sheetId, String userId, String range) {
+		// TODO Auto-generated method stub
+
+		if(sheetId == null || userId == null /*|| password == null */) {
+			throw new WebApplicationException( Status.BAD_REQUEST ); //400
+		}  
+
+		Spreadsheet sheet = sheets.get(sheetId);
+		if(sheet == null) {
+			throw new WebApplicationException( Status.NOT_FOUND); //404
+		}
+
+		if(!sheet.getOwner().equals(userId) && !(sheet.getSharedWith().contains(userId))) {
+			throw new WebApplicationException( Status.FORBIDDEN ); //403
+		}
+
+		String[][] values = SpreadsheetEngineImpl.getInstance().computeSpreadsheetValues( new AbstractSpreadsheet() {
+			@Override
+			public int rows() {
+				return sheet.getRows();
+			}
+
+			@Override
+			public int columns() {
+				return sheet.getColumns();
+			}
+
+			@Override
+			public String sheetId() {
+				return sheet.getSheetId();
+			}
+
+			@Override
+			public String cellRawValue(int row, int col) {
+				try {
+					return sheet.getCellRawValue(row, col);
+				} catch( IndexOutOfBoundsException e) {
+					return "#ERR?";
+				}
+			}
+			
+			@Override
+			public String[][] getRangeValues(String sheetURL, String range) {
+			String user = String.format("%s@%s", sheet.getOwner(), domain);
+			
+			WebTarget target = client.target(sheetURL).path("/range");
+
+			short retries = 0;
+
+			while(retries < MAX_RETRIES) {
+
+				try {
+					Response r = target.queryParam("userId", user).queryParam("range", range).request()
+					.accept(MediaType.APPLICATION_JSON)
+					.get();
+
+					if( r.getStatus() == Status.OK.getStatusCode() && r.hasEntity() ) {
+						return r.readEntity(String[][].class);
+					} else {
+						throw new WebApplicationException(r.getStatus());
+					}
+
+				} catch (ProcessingException pe) {
+					retries++;
+				try { 
+					Thread.sleep(RETRY_PERIOD);
+				} catch (InterruptedException e) {
+				}
+			}
+		}
+			return null;		
+		}
+		});
+
+		CellRange cellRange = new CellRange(range);
+		String[][] rangeValues = cellRange.extractRangeValuesFrom(values);
+
+		return rangeValues;
 	}
 
 	private int requestUser(String userDomain, String userId, String password) {
