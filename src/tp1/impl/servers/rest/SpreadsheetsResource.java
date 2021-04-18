@@ -32,6 +32,7 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 	public static final int REPLY_TIMEOUT = 600;
 
 	private final Map<String, Spreadsheet> sheets = new HashMap<String, Spreadsheet>();
+	private final Map<String, Set<String>> userSheets = new HashMap<String, Set<String>>();
 	private static Discovery discovery;
 	private static String domain;
 	private static Client client;
@@ -73,6 +74,14 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 			sheet.setSheetURL(sheetURL);
 
 			sheets.put(id, sheet);
+			
+			Set<String> sheets = userSheets.get(sheet.getOwner());
+			if( sheets == null) {
+				sheets = new HashSet<String>();
+			} 
+			
+			sheets.add(id);
+			userSheets.put(sheet.getOwner(), sheets);
 		
 		} catch (UnknownHostException e) {
 		}
@@ -379,6 +388,19 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 		String[][] rangeValues = cellRange.extractRangeValuesFrom(values);
 
 		return rangeValues;
+	}
+	
+	@Override
+	public void deleteUserSpreadsheets(String userId) {
+		
+		if(userId == null) {
+			throw new WebApplicationException( Status.BAD_REQUEST ); //400
+		}
+		
+		for( String id : userSheets.get(userId)) {
+			sheets.remove(id);
+		}
+		userSheets.remove(userId);
 	}
 
 	private int requestUser(String userDomain, String userId, String password) {

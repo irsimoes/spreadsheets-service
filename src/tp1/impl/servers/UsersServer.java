@@ -25,18 +25,18 @@ public class UsersServer {
 	public static void main(String[] args) {
 		try {
 		String ip = InetAddress.getLocalHost().getHostAddress();
-			
-		ResourceConfig config = new ResourceConfig();
-		config.register(UsersResource.class);
 
 		String serverURI = String.format("http://%s:%s/rest", ip, PORT);
-		JdkHttpServerFactory.createHttpServer( URI.create(serverURI), config);
+		
 		Discovery discovery = Discovery.getInstance();
 		discovery.start(args[0], SERVICE, serverURI);
-	
+
+		ResourceConfig config = new ResourceConfig();
+		config.register(new UsersResource(args[0], discovery));
+		JdkHttpServerFactory.createHttpServer( URI.create(serverURI), config);
+		
 		Log.info(String.format("%s Server ready @ %s\n",  SERVICE, serverURI));
 		
-		//More code can be executed here...
 		} catch( Exception e) {
 			Log.severe(e.getMessage());
 		}
