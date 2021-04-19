@@ -24,7 +24,7 @@ public class UsersResource implements RestUsers {
 	public static final int PORT = 8080;
 	public static final int MAX_RETRIES = 3;
 	public static final long RETRY_PERIOD = 1000;
-	public static final int CONNECTION_TIMEOUT = 1000;
+	public static final int CONNECTION_TIMEOUT = 10000;
 	public static final int REPLY_TIMEOUT = 600;
 
 	private final Map<String,User> users = new HashMap<String, User>();
@@ -52,28 +52,32 @@ public class UsersResource implements RestUsers {
 			throw new WebApplicationException( Status.BAD_REQUEST ); //400
 		}
 		
-		if( users.containsKey(user.getUserId())) {
-			throw new WebApplicationException( Status.CONFLICT ); //409
+		synchronized(users) {
+			if(users.containsKey(user.getUserId())) {
+				throw new WebApplicationException( Status.CONFLICT ); //409
+			}
+			
+			users.put(user.getUserId(), user);
 		}
-
-		users.put(user.getUserId(), user);
 		
 		return user.getUserId();
 	}
 
 
 	@Override
-	public User getUser(String userId, String password) {		
-		User user = users.get(userId);
+	public User getUser(String userId, String password) {
+		User user;
+		synchronized(users) {
+			user = users.get(userId);
 		
-		if( user == null ) {
-			throw new WebApplicationException( Status.NOT_FOUND ); //404
+			if( user == null ) {
+				throw new WebApplicationException( Status.NOT_FOUND ); //404
+			}
+		
+			if( !user.getPassword().equals( password)) {
+				throw new WebApplicationException( Status.FORBIDDEN ); //403
+			}
 		}
-		
-		if( !user.getPassword().equals( password)) {
-			throw new WebApplicationException( Status.FORBIDDEN ); //403
-		}
-		
 		return user;
 	}
 
@@ -82,18 +86,21 @@ public class UsersResource implements RestUsers {
 	public User updateUser(String userId, String password, User user) {
 		// TODO Complete method
 		
-		User updateUser = getUser(userId, password);
+		User updateUser;
+		synchronized(users) {
+			updateUser = getUser(userId, password);
 
-		if(user.getPassword() != null) {
-			updateUser.setPassword(user.getPassword());
-		}
+			if(user.getPassword() != null) {
+				updateUser.setPassword(user.getPassword());
+			}
 		
-		if(user.getFullName() != null) {
-			updateUser.setFullName(user.getFullName());
-		}
+			if(user.getFullName() != null) {
+				updateUser.setFullName(user.getFullName());
+			}
 
-		if(user.getEmail() != null) {
-			updateUser.setEmail(user.getEmail());
+			if(user.getEmail() != null) {
+				updateUser.setEmail(user.getEmail());
+			}
 		}
 		
 		return updateUser;
@@ -104,8 +111,11 @@ public class UsersResource implements RestUsers {
 	public User deleteUser(String userId, String password) {
 		// TODO Complete method
 		
-		User user = this.getUser(userId, password);
-		users.remove(userId);
+		User user;
+		synchronized(users) {
+			user = getUser(userId, password);
+			users.remove(userId);
+		}
 		
 		URI[] uri = null;
 		while(uri == null) {
@@ -151,10 +161,13 @@ public class UsersResource implements RestUsers {
 		// TODO Complete method
 		
 		List<User> userList = new ArrayList<User>();
-		for(User u : users.values()) {
-			if((u.getFullName().toLowerCase()).contains(pattern.toLowerCase())) {
-				User user = new User(u.getUserId(), u.getFullName(), u.getEmail(), "");
-				userList.add(user);
+		
+		synchronized(users) {
+			for(User u : users.values()) {
+				if((u.getFullName().toLowerCase()).contains(pattern.toLowerCase())) {
+					User user = new User(u.getUserId(), u.getFullName(), u.getEmail(), "");
+					userList.add(user);
+				}
 			}
 		}
 		
