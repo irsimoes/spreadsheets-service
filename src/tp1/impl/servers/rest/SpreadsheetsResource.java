@@ -76,13 +76,13 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 			synchronized (this) {
 				sheets.put(id, sheet);
 
-				Set<String> sheets = userSheets.get(sheet.getOwner());
-				if (sheets == null) {
-					sheets = new HashSet<String>();
+				Set<String> sheetsSet = userSheets.get(sheet.getOwner());
+				if (sheetsSet == null) {
+					sheetsSet = new HashSet<String>();
 				}
 
-				sheets.add(id);
-				userSheets.put(sheet.getOwner(), sheets);
+				sheetsSet.add(id);
+				userSheets.put(sheet.getOwner(), sheetsSet);
 			}
 		} catch (UnknownHostException e) {
 		}
@@ -440,7 +440,7 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 						}
 					}
 				}
-				return null;
+				return cellCache.get(String.format("%s@%s", sheetURL, range));
 			}
 		});
 

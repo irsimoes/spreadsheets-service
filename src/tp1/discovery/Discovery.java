@@ -44,7 +44,7 @@ public class Discovery {
 //	private String domain;
 //	private String service;
 //	private String serviceURI;
-	private Map<String, Map<String, Long>> services = new HashMap<String, Map<String, Long>>(); //service name, uri, timestamp
+	private Map<String, Map<URI, Long>> services = new HashMap<String, Map<URI, Long>>(); //service name, uri, timestamp
 //	private boolean announce;
 	private boolean active;
 
@@ -121,9 +121,9 @@ public class Discovery {
 									//pkt.getAddress().getHostAddress(), msg);
 							//TODO: to complete by recording the received information from the other node.
 							String serviceKey = msgElems[0];
-							String uri = msgElems[1];
+							URI uri = URI.create(msgElems[1]);
 							if(services.get(serviceKey) == null) {
-								Map<String, Long> uriTimestamps = new HashMap<String, Long>();
+								Map<URI, Long> uriTimestamps = new HashMap<URI, Long>();
 								services.put(serviceKey, uriTimestamps);
 							}
 							services.get(serviceKey).put(uri, System.currentTimeMillis());
@@ -148,16 +148,17 @@ public class Discovery {
 		//TODO: You have to implement this!!
 		String serviceName = String.format("%s:%s", domain, service);
 		URI[] uris;
-		Map<String, Long> aux = services.get(serviceName);
+		Map<URI, Long> aux = services.get(serviceName);
 		if(aux == null) {
 			uris = null;
 		} else {
-			Set<String> knownUris = aux.keySet();
-			uris = new URI[knownUris.size()];
-			int i = 0;
-			for(String uri : knownUris) {
-				uris[i++] = URI.create(uri);
-			}
+			Set<URI> knownUris = aux.keySet();
+			//uris = new URI[knownUris.size()];
+			uris = knownUris.toArray(new URI[knownUris.size()]);
+			//int i = 0;
+			//for(URI uri : knownUris) {
+			//	uris[i++] = uri;
+			//}
 		}
 		return uris;
 	}	
