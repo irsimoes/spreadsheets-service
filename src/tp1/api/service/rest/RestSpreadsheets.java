@@ -162,7 +162,7 @@ public interface RestSpreadsheets {
 	@Path("/{sheetId}/range")
 	@Produces(MediaType.APPLICATION_JSON)
 	String[][] getRange(@PathParam("sheetId") String sheetId, 
-			@QueryParam("userId") String userId, @QueryParam("range") String range);
+			@QueryParam("userId") String userId, @QueryParam("userDomain") String userDomain, @QueryParam("range") String range);
 	
 	/**
 	 * Removes all the spreadsheets the deleted user had.

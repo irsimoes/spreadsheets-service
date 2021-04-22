@@ -3,8 +3,14 @@ package tp1.impl.servers.rest;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
 
+import com.sun.xml.ws.client.BindingProviderProperties;
+
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URL;
 import java.util.*;
+
+import javax.xml.namespace.QName;
 
 import jakarta.inject.Singleton;
 import jakarta.ws.rs.ProcessingException;
@@ -14,10 +20,16 @@ import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.Service;
+import jakarta.xml.ws.WebServiceException;
 import tp1.api.User;
 import tp1.api.service.rest.RestSpreadsheets;
 import tp1.api.service.rest.RestUsers;
+import tp1.api.service.soap.SheetsException;
+import tp1.api.service.soap.SoapSpreadsheets;
 import tp1.discovery.Discovery;
+import tp1.impl.servers.soap.SpreadsheetsWS;
 
 @Singleton
 public class UsersResource implements RestUsers {
@@ -127,31 +139,70 @@ public class UsersResource implements RestUsers {
 		}
 		
 		String serverUrl = uri[0].toString();
-		WebTarget target = client.target( serverUrl ).path(RestSpreadsheets.PATH).path("/delete");
-
+		
 		short retries = 0;
 		boolean success = false;
 		
-		while(!success && retries < MAX_RETRIES) {
-	
-			try {
-				Response r = target.path(userId).request()
-				.delete();
-				
-				if( r.getStatus() != Status.NO_CONTENT.getStatusCode() ) {
-					throw new WebApplicationException(r.getStatus());
-				}
-				
-				success = true;
+		if(serverUrl.contains("rest")) {
+			WebTarget target = client.target( serverUrl ).path(RestSpreadsheets.PATH).path("/delete");
+			
+			while(!success && retries < MAX_RETRIES) {
+		
+				try {
+					Response r = target.path(userId).request()
+					.delete();
+					
+					if( r.getStatus() != Status.NO_CONTENT.getStatusCode() ) {
+						throw new WebApplicationException(r.getStatus());
+					}
+					
+					success = true;
 
-			} catch (ProcessingException pe) {
-				retries++;
-				try { 
-					Thread.sleep(RETRY_PERIOD);
-				} catch (InterruptedException e) {
+				} catch (ProcessingException pe) {
+					retries++;
+					try { 
+						Thread.sleep(RETRY_PERIOD);
+					} catch (InterruptedException e) {
+					}
 				}
 			}
-		}	
+		} else {
+			SoapSpreadsheets sheets = null;
+			
+			while(!success && retries < MAX_RETRIES) {
+				try {
+					QName QNAME = new QName(SoapSpreadsheets.NAMESPACE, SoapSpreadsheets.NAME);
+					Service service = Service.create( new URL(serverUrl + SpreadsheetsWS.SHEETS_WSDL), QNAME);
+					sheets = service.getPort( tp1.api.service.soap.SoapSpreadsheets.class);
+					success = true;
+				} catch (WebServiceException e) {
+					retries++;
+				} catch (MalformedURLException e) {
+				}
+			}
+			
+			((BindingProvider) sheets).getRequestContext().put(BindingProviderProperties.CONNECT_TIMEOUT, CONNECTION_TIMEOUT);
+			((BindingProvider) sheets).getRequestContext().put(BindingProviderProperties.REQUEST_TIMEOUT, REPLY_TIMEOUT);
+			
+			retries = 0; success = false;
+			
+			while(!success && retries < MAX_RETRIES) {
+				
+				try{
+					sheets.deleteUserSpreadsheets(userId);
+					success = true;
+				} catch(WebServiceException wse) {
+					retries++;
+					try {
+						Thread.sleep(RETRY_PERIOD);
+					} catch (InterruptedException e) {
+					}
+				} catch(SheetsException se) {
+					throw new WebApplicationException(Status.BAD_REQUEST);
+				}
+			}
+		}
+		
 		return user;
 	}
 
@@ -172,6 +223,20 @@ public class UsersResource implements RestUsers {
 		}
 		
 		return userList;
+	}
+	
+	@Override
+	public boolean userExists(String userId) {
+		// TODO Auto-generated method stub
+		
+		synchronized(users) {
+			User user = users.get(userId);
+		
+			if( user == null ) {
+				throw new WebApplicationException(Status.NOT_FOUND);
+			}
+		}
+		return true;
 	}
 
 }

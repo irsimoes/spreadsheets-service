@@ -89,5 +89,16 @@ public interface RestUsers {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	List<User> searchUsers(@QueryParam("query") String pattern);
+	
+	/*
+	 * Checks if a user exists
+	 * @param userId to be searched
+	 * @return 200 if the user exists
+	 * 		   404 otherwise
+	 */
+	@GET
+	@Path("/exists/{userId}")
+	@Produces(MediaType.APPLICATION_JSON)
+	boolean userExists(@PathParam("userId") String userId);
 
 }

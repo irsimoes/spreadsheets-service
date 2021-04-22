@@ -9,14 +9,26 @@ import java.util.List;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
+
+import org.glassfish.jersey.client.ClientConfig;
+import org.glassfish.jersey.client.ClientProperties;
+
 import com.sun.xml.ws.client.BindingProviderProperties;
 
 import jakarta.xml.ws.BindingProvider;
 import jakarta.inject.Singleton;
 import jakarta.jws.WebService;
+import jakarta.ws.rs.ProcessingException;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 import jakarta.xml.ws.Service;
 import jakarta.xml.ws.WebServiceException;
 import tp1.api.User;
+import tp1.api.service.rest.RestSpreadsheets;
 import tp1.api.service.soap.SheetsException;
 import tp1.api.service.soap.SoapSpreadsheets;
 import tp1.api.service.soap.SoapUsers;
@@ -41,6 +53,7 @@ public class UsersWS implements SoapUsers {
 	private final Map<String,User> users = new HashMap<String,User>();
 	private static Discovery discovery;
 	private static String domain;
+	private static Client client;
 	
 	public UsersWS() {
 	}
@@ -48,6 +61,10 @@ public class UsersWS implements SoapUsers {
 	public UsersWS(Discovery discovery, String domain) {
 		UsersWS.discovery = discovery;
 		UsersWS.domain = domain;
+		ClientConfig config = new ClientConfig();
+		config.property(ClientProperties.CONNECT_TIMEOUT, CONNECTION_TIMEOUT);
+		config.property(ClientProperties.READ_TIMEOUT, REPLY_TIMEOUT);
+		client = ClientBuilder.newClient(config);
 	}
 	
 	@Override
@@ -130,41 +147,67 @@ public class UsersWS implements SoapUsers {
 		}
 		
 		String serverUrl = uri[0].toString();
-		SoapSpreadsheets sheets = null;
 		
 		short retries = 0;
 		boolean success = false;
 		
-		while(!success && retries < MAX_RETRIES) {
-			try {
-				QName QNAME = new QName(SoapSpreadsheets.NAMESPACE, SoapSpreadsheets.NAME);
-				Service service = Service.create( new URL(serverUrl + SpreadsheetsWS.SHEETS_WSDL), QNAME);
-				sheets = service.getPort( tp1.api.service.soap.SoapSpreadsheets.class);
-				success = true;
-			} catch (WebServiceException e) {
-				retries++;
-			} catch (MalformedURLException e) {
-			}
-		}
-		
-		((BindingProvider) sheets).getRequestContext().put(BindingProviderProperties.CONNECT_TIMEOUT, CONNECTION_TIMEOUT);
-		((BindingProvider) sheets).getRequestContext().put(BindingProviderProperties.REQUEST_TIMEOUT, REPLY_TIMEOUT);
-		
-		retries = 0; success = false;
-		
-		while(!success && retries < MAX_RETRIES) {
+		if(serverUrl.contains("rest")) {
+			WebTarget target = client.target( serverUrl ).path(RestSpreadsheets.PATH).path("/delete");
 			
-			try{
-				sheets.deleteUserSpreadsheets(userId);
-				success = true;
-			} catch(WebServiceException wse) {
-				retries++;
+			while(!success && retries < MAX_RETRIES) {
+		
 				try {
-					Thread.sleep(RETRY_PERIOD);
-				} catch (InterruptedException e) {
+					Response r = target.path(userId).request()
+					.delete();
+					
+					if( r.getStatus() != Status.NO_CONTENT.getStatusCode() ) {
+						throw new WebApplicationException(r.getStatus());
+					}
+					
+					success = true;
+
+				} catch (ProcessingException pe) {
+					retries++;
+					try { 
+						Thread.sleep(RETRY_PERIOD);
+					} catch (InterruptedException e) {
+					}
 				}
-			} catch(SheetsException se) {
-				throw new UsersException();
+			}
+		} else {
+			SoapSpreadsheets sheets = null;
+			
+			while(!success && retries < MAX_RETRIES) {
+				try {
+					QName QNAME = new QName(SoapSpreadsheets.NAMESPACE, SoapSpreadsheets.NAME);
+					Service service = Service.create( new URL(serverUrl + SpreadsheetsWS.SHEETS_WSDL), QNAME);
+					sheets = service.getPort( tp1.api.service.soap.SoapSpreadsheets.class);
+					success = true;
+				} catch (WebServiceException e) {
+					retries++;
+				} catch (MalformedURLException e) {
+				}
+			}
+			
+			((BindingProvider) sheets).getRequestContext().put(BindingProviderProperties.CONNECT_TIMEOUT, CONNECTION_TIMEOUT);
+			((BindingProvider) sheets).getRequestContext().put(BindingProviderProperties.REQUEST_TIMEOUT, REPLY_TIMEOUT);
+			
+			retries = 0; success = false;
+			
+			while(!success && retries < MAX_RETRIES) {
+				
+				try{
+					sheets.deleteUserSpreadsheets(userId);
+					success = true;
+				} catch(WebServiceException wse) {
+					retries++;
+					try {
+						Thread.sleep(RETRY_PERIOD);
+					} catch (InterruptedException e) {
+					}
+				} catch(SheetsException se) {
+					throw new WebApplicationException(Status.BAD_REQUEST);
+				}
 			}
 		}
 		
