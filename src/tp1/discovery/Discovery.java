@@ -8,7 +8,6 @@ import java.net.MulticastSocket;
 import java.net.NetworkInterface;
 import java.net.URI;
 import java.util.*;
-//import java.util.logging.Logger;
 
 /**
  * <p>A class to perform service discovery, based on periodic service contact endpoint 
@@ -23,7 +22,6 @@ import java.util.*;
  */
 
 public class Discovery {
-	//private static Logger Log = Logger.getLogger(Discovery.class.getName());
 
 	static {
 		// addresses some multicast issues on some TCP/IP stacks
@@ -41,33 +39,12 @@ public class Discovery {
 	private static final String DELIMITER = "\t";
 
 	private InetSocketAddress addr;
-//	private String domain;
-//	private String service;
-//	private String serviceURI;
 	private Map<String, Map<URI, Long>> services = new HashMap<String, Map<URI, Long>>(); //service name, uri, timestamp
-//	private boolean announce;
 	private boolean active;
 
 	private static Discovery instance;
-
-	/**
-	 * @param  serviceName the name of the service to announce
-	 * @param  serviceURI an uri string - representing the contact endpoint of the service being announced
-	 */
-/*	public Discovery(String serviceName, String serviceURI) { //server
-		this.addr = DISCOVERY_ADDR;
-		this.services = new HashMap<String, Map<String, Long>>();
-		this.serviceName = serviceName;
-		this.serviceURI  = serviceURI;
-		this.announce = true;
-		this.active = true;
-	} */
 	
-	private Discovery() { //client 
-/*		this.addr = DISCOVERY_ADDR;
-		this.services = new HashMap<String, Map<String, Long>>();
-		this.announce = false;
-		this.active = true;		*/
+	private Discovery() {
 	}
 
 	static synchronized public Discovery getInstance() {
@@ -80,7 +57,6 @@ public class Discovery {
 	 * Starts sending service announcements at regular intervals... 
 	 */
 	public void start(String domain, String service, String serviceURI) {
-		//Log.info(String.format("Starting Discovery announcements on: %s for: %s -> %s", addr, serviceName, serviceURI));
 
 		this.addr = DISCOVERY_ADDR;
 		String serviceName = String.format("%s:%s", domain, service);
@@ -90,7 +66,6 @@ public class Discovery {
 			MulticastSocket ms = new MulticastSocket( addr.getPort());
 			ms.joinGroup(addr, NetworkInterface.getByInetAddress(InetAddress.getLocalHost()));
 			
-//			if(announce) {
 			byte[] announceBytes = String.format("%s%s%s", serviceName, DELIMITER, serviceURI).getBytes();
 			DatagramPacket announcePkt = new DatagramPacket(announceBytes, announceBytes.length, addr);
 			
@@ -106,7 +81,7 @@ public class Discovery {
 					}
 				}
 			}).start();
-//			}
+
 			// start thread to collect announcements
 			new Thread(() -> {
 				DatagramPacket pkt = new DatagramPacket(new byte[1024], 1024);
@@ -117,9 +92,6 @@ public class Discovery {
 						String msg = new String( pkt.getData(), 0, pkt.getLength());
 						String[] msgElems = msg.split(DELIMITER);
 						if( msgElems.length == 2) {	//periodic announcement
-							//System.out.printf( "FROM %s (%s) : %s\n", pkt.getAddress().getCanonicalHostName(), 
-									//pkt.getAddress().getHostAddress(), msg);
-							//TODO: to complete by recording the received information from the other node.
 							String serviceKey = msgElems[0];
 							URI uri = URI.create(msgElems[1]);
 							if(services.get(serviceKey) == null) {
@@ -145,7 +117,6 @@ public class Discovery {
 
 	
 	public URI[] knownUrisOf(String domain, String service) {
-		//TODO: You have to implement this!!
 		String serviceName = String.format("%s:%s", domain, service);
 		URI[] uris;
 		Map<URI, Long> aux = services.get(serviceName);
@@ -153,12 +124,7 @@ public class Discovery {
 			uris = null;
 		} else {
 			Set<URI> knownUris = aux.keySet();
-			//uris = new URI[knownUris.size()];
 			uris = knownUris.toArray(new URI[knownUris.size()]);
-			//int i = 0;
-			//for(URI uri : knownUris) {
-			//	uris[i++] = uri;
-			//}
 		}
 		return uris;
 	}	

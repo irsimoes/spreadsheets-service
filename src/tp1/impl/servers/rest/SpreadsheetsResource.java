@@ -69,7 +69,6 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 
 	@Override
 	public String createSpreadsheet(Spreadsheet sheet, String password) {
-		// TODO Auto-generated method stub
 
 		if (sheet == null || password == null || sheet.getSheetId() != null || sheet.getSheetURL() != null
 				|| sheet.getRows() < 0 || sheet.getColumns() < 0) {
@@ -108,7 +107,6 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 
 	@Override
 	public void deleteSpreadsheet(String sheetId, String password) {
-		// TODO Auto-generated method stub
 
 		if (sheetId == null || password == null) {
 			throw new WebApplicationException(Status.BAD_REQUEST); // 400
@@ -142,7 +140,6 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 
 	@Override
 	public Spreadsheet getSpreadsheet(String sheetId, String userId, String password) {
-		// TODO Auto-generated method stub
 
 		if (sheetId == null || userId == null) {
 			throw new WebApplicationException(Status.BAD_REQUEST); // 400
@@ -170,7 +167,6 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 
 	@Override
 	public String[][] getSpreadsheetValues(String sheetId, String userId, String password) {
-		// TODO Auto-generated method stub
 
 		if (sheetId == null || userId == null) {
 			throw new WebApplicationException(Status.BAD_REQUEST); // 400
@@ -239,11 +235,7 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 								return values;
 							} else {
 								values = cellCache.get(String.format("%s@%s", sheetURL, range));
-								if(values != null) {
-									return values;
-								} else {
 									throw new WebApplicationException(r.getStatus());
-								}
 							}
 
 						} catch (ProcessingException pe) {
@@ -295,10 +287,7 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 							} catch (InterruptedException e) {
 							}
 						} catch (SheetsException e) {
-							values = cellCache.get(String.format("%s@%s", sheetURL, range));
-							if(values != null) {
-								return values;
-							}
+							throw new WebApplicationException(Status.BAD_REQUEST);
 						}
 					}
 				}
@@ -310,7 +299,6 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 
 	@Override
 	public void updateCell(String sheetId, String cell, String rawValue, String userId, String password) {
-		// TODO Auto-generated method stub
 
 		if (sheetId == null || userId == null || password == null || rawValue == null) {
 			throw new WebApplicationException(Status.BAD_REQUEST); // 400
@@ -338,7 +326,6 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 
 	@Override
 	public void shareSpreadsheet(String sheetId, String userId, String password) {
-		// TODO Auto-generated method stub
 
 		if (sheetId == null || userId == null || password == null) {
 			throw new WebApplicationException(Status.BAD_REQUEST); // 400
@@ -383,7 +370,7 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 
 	@Override
 	public void unshareSpreadsheet(String sheetId, String userId, String password) {
-		// TODO Auto-generated method stub
+
 		if (sheetId == null || userId == null || password == null) {
 			throw new WebApplicationException(Status.BAD_REQUEST); // 400
 		}
@@ -420,7 +407,6 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 
 	@Override
 	public String[][] getRange(String sheetId, String userId, String userDomain, String range) {
-		// TODO Auto-generated method stub
 
 		if (sheetId == null || userId == null) {
 			throw new WebApplicationException(Status.BAD_REQUEST); // 400
@@ -485,17 +471,10 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 							if (r.getStatus() == Status.OK.getStatusCode() && r.hasEntity()) {
 								values = r.readEntity(String[][].class);
 								cellCache.put(String.format("%s@%s", sheetURL, range), values);
-
 								return values;
 							} else {
-								values = cellCache.get(String.format("%s@%s", sheetURL, range));
-								if(values != null) {
-									return values;
-								} else {
-									throw new WebApplicationException(r.getStatus());
-								}
+								throw new WebApplicationException(r.getStatus());
 							}
-
 						} catch (ProcessingException pe) {
 							retries++;
 							try {
@@ -545,10 +524,7 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 							} catch (InterruptedException e) {
 							}
 						} catch (SheetsException e) {
-							values = cellCache.get(String.format("%s@%s", sheetURL, range));
-							if(values != null) {
-								return values;
-							}
+							throw new WebApplicationException(Status.BAD_REQUEST); // 400
 						}
 					}
 				}

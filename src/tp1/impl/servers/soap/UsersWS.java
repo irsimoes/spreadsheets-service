@@ -35,26 +35,24 @@ import tp1.api.service.soap.SoapUsers;
 import tp1.api.service.soap.UsersException;
 import tp1.discovery.Discovery;
 
-@WebService(serviceName = SoapUsers.NAME,
-targetNamespace = SoapUsers.NAMESPACE,
-endpointInterface = SoapUsers.INTERFACE)
+@WebService(serviceName = SoapUsers.NAME, targetNamespace = SoapUsers.NAMESPACE, endpointInterface = SoapUsers.INTERFACE)
 
 @Singleton
 public class UsersWS implements SoapUsers {
-	
+
 	public final static String USERS_WSDL = "/users/?wsdl";
-	
+
 	public static final int PORT = 8080;
 	public static final int MAX_RETRIES = 3;
 	public static final long RETRY_PERIOD = 1000;
 	public static final int CONNECTION_TIMEOUT = 10000;
 	public static final int REPLY_TIMEOUT = 600;
-	
-	private final Map<String,User> users = new HashMap<String,User>();
+
+	private final Map<String, User> users = new HashMap<String, User>();
 	private static Discovery discovery;
 	private static String domain;
 	private static Client client;
-	
+
 	public UsersWS() {
 	}
 
@@ -66,38 +64,38 @@ public class UsersWS implements SoapUsers {
 		config.property(ClientProperties.READ_TIMEOUT, REPLY_TIMEOUT);
 		client = ClientBuilder.newClient(config);
 	}
-	
+
 	@Override
 	public String createUser(User user) throws UsersException {
-		// TODO Auto-generated method stub
-		if(user.getUserId() == null || user.getPassword() == null || user.getFullName() == null || 
-				user.getEmail() == null) {
+
+		if (user.getUserId() == null || user.getPassword() == null || user.getFullName() == null
+				|| user.getEmail() == null) {
 			throw new UsersException();
 		}
-		
-		synchronized(users) {
-			if(users.containsKey(user.getUserId())) {
+
+		synchronized (users) {
+			if (users.containsKey(user.getUserId())) {
 				throw new UsersException();
 			}
-			
+
 			users.put(user.getUserId(), user);
 		}
-		
+
 		return user.getUserId();
 	}
 
 	@Override
 	public User getUser(String userId, String password) throws UsersException {
-		// TODO Complete method
+
 		User user;
-		synchronized(users) {
+		synchronized (users) {
 			user = users.get(userId);
-		
-			if( user == null ) {
+
+			if (user == null) {
 				throw new UsersException();
 			}
-		
-			if( !user.getPassword().equals( password)) {
+
+			if (!user.getPassword().equals(password)) {
 				throw new UsersException();
 			}
 		}
@@ -106,139 +104,139 @@ public class UsersWS implements SoapUsers {
 
 	@Override
 	public User updateUser(String userId, String password, User user) throws UsersException {
-		// TODO Auto-generated method stub
+
 		User updateUser;
-		synchronized(users) {
+		synchronized (users) {
 			updateUser = getUser(userId, password);
 
-			if(user.getPassword() != null) {
+			if (user.getPassword() != null) {
 				updateUser.setPassword(user.getPassword());
 			}
-		
-			if(user.getFullName() != null) {
+
+			if (user.getFullName() != null) {
 				updateUser.setFullName(user.getFullName());
 			}
 
-			if(user.getEmail() != null) {
+			if (user.getEmail() != null) {
 				updateUser.setEmail(user.getEmail());
 			}
 		}
-		
+
 		return updateUser;
 	}
 
 	@Override
 	public User deleteUser(String userId, String password) throws UsersException {
-		// TODO Auto-generated method stub
-		
+
 		User user;
-		synchronized(users) {
+		synchronized (users) {
 			user = getUser(userId, password);
 			users.remove(userId);
 		}
-		
-		URI[] uri = null;
-		while(uri == null) {
-			try {
-				uri = discovery.knownUrisOf(domain, "sheets");
-				Thread.sleep(500);
-			} catch (Exception e) {
-			}
-		}
-		
-		String serverUrl = uri[0].toString();
-		
-		short retries = 0;
-		boolean success = false;
-		
-		if(serverUrl.contains("rest")) {
-			WebTarget target = client.target( serverUrl ).path(RestSpreadsheets.PATH).path("/delete");
-			
-			while(!success && retries < MAX_RETRIES) {
-		
+		new Thread(() -> {
+			URI[] uri = null;
+			while (uri == null) {
 				try {
-					Response r = target.path(userId).request()
-					.delete();
-					
-					if( r.getStatus() != Status.NO_CONTENT.getStatusCode() ) {
-						throw new WebApplicationException(r.getStatus());
-					}
-					
-					success = true;
+					uri = discovery.knownUrisOf(domain, "sheets");
+					Thread.sleep(500);
+				} catch (Exception e) {
+				}
+			}
+			String serverUrl = uri[0].toString();
 
-				} catch (ProcessingException pe) {
-					retries++;
-					try { 
-						Thread.sleep(RETRY_PERIOD);
-					} catch (InterruptedException e) {
-					}
-				}
-			}
-		} else {
-			SoapSpreadsheets sheets = null;
-			
-			while(!success && retries < MAX_RETRIES) {
-				try {
-					QName QNAME = new QName(SoapSpreadsheets.NAMESPACE, SoapSpreadsheets.NAME);
-					Service service = Service.create( new URL(serverUrl + SpreadsheetsWS.SHEETS_WSDL), QNAME);
-					sheets = service.getPort( tp1.api.service.soap.SoapSpreadsheets.class);
-					success = true;
-				} catch (WebServiceException e) {
-					retries++;
-				} catch (MalformedURLException e) {
-				}
-			}
-			
-			((BindingProvider) sheets).getRequestContext().put(BindingProviderProperties.CONNECT_TIMEOUT, CONNECTION_TIMEOUT);
-			((BindingProvider) sheets).getRequestContext().put(BindingProviderProperties.REQUEST_TIMEOUT, REPLY_TIMEOUT);
-			
-			retries = 0; success = false;
-			
-			while(!success && retries < MAX_RETRIES) {
-				
-				try{
-					sheets.deleteUserSpreadsheets(userId);
-					success = true;
-				} catch(WebServiceException wse) {
-					retries++;
+			short retries = 0;
+			boolean success = false;
+
+			if (serverUrl.contains("rest")) {
+				WebTarget target = client.target(serverUrl).path(RestSpreadsheets.PATH).path("/delete");
+
+				while (!success && retries < MAX_RETRIES) {
+
 					try {
-						Thread.sleep(RETRY_PERIOD);
-					} catch (InterruptedException e) {
+						Response r = target.path(userId).request().delete();
+
+						if (r.getStatus() != Status.NO_CONTENT.getStatusCode()) {
+							throw new WebApplicationException(r.getStatus());
+						}
+
+						success = true;
+
+					} catch (ProcessingException pe) {
+						retries++;
+						try {
+							Thread.sleep(RETRY_PERIOD);
+						} catch (InterruptedException e) {
+						}
 					}
-				} catch(SheetsException se) {
-					throw new WebApplicationException(Status.BAD_REQUEST);
+				}
+			} else {
+				SoapSpreadsheets sheets = null;
+
+				while (!success && retries < MAX_RETRIES) {
+					try {
+						QName QNAME = new QName(SoapSpreadsheets.NAMESPACE, SoapSpreadsheets.NAME);
+						Service service = Service.create(new URL(serverUrl + SpreadsheetsWS.SHEETS_WSDL), QNAME);
+						sheets = service.getPort(tp1.api.service.soap.SoapSpreadsheets.class);
+						success = true;
+					} catch (WebServiceException e) {
+						retries++;
+					} catch (MalformedURLException e) {
+					}
+				}
+
+				((BindingProvider) sheets).getRequestContext().put(BindingProviderProperties.CONNECT_TIMEOUT,
+						CONNECTION_TIMEOUT);
+				((BindingProvider) sheets).getRequestContext().put(BindingProviderProperties.REQUEST_TIMEOUT,
+						REPLY_TIMEOUT);
+
+				retries = 0;
+				success = false;
+
+				while (!success && retries < MAX_RETRIES) {
+
+					try {
+						sheets.deleteUserSpreadsheets(userId);
+						success = true;
+					} catch (WebServiceException wse) {
+						retries++;
+						try {
+							Thread.sleep(RETRY_PERIOD);
+						} catch (InterruptedException e) {
+						}
+					} catch (SheetsException se) {
+						throw new WebApplicationException(Status.BAD_REQUEST);
+					}
 				}
 			}
-		}
-		
+		}).start();
+
 		return user;
 	}
 
 	@Override
 	public List<User> searchUsers(String pattern) throws UsersException {
-		// TODO Auto-generated method stub
+
 		List<User> userList = new ArrayList<User>();
-		
-		synchronized(users) {
-			for(User u : users.values()) {
-				if((u.getFullName().toLowerCase()).contains(pattern.toLowerCase())) {
+
+		synchronized (users) {
+			for (User u : users.values()) {
+				if ((u.getFullName().toLowerCase()).contains(pattern.toLowerCase())) {
 					User user = new User(u.getUserId(), u.getFullName(), u.getEmail(), "");
 					userList.add(user);
 				}
 			}
 		}
-		
+
 		return userList;
 	}
 
 	@Override
 	public boolean userExists(String userId) throws UsersException {
-		// TODO Auto-generated method stub
-		
-		synchronized(users) {
+
+		synchronized (users) {
 			User user = users.get(userId);
-		
-			if( user == null ) {
+
+			if (user == null) {
 				throw new UsersException();
 			}
 		}

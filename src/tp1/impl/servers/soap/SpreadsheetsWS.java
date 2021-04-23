@@ -21,7 +21,6 @@ import com.sun.xml.ws.client.BindingProviderProperties;
 import jakarta.inject.Singleton;
 import jakarta.jws.WebService;
 import jakarta.ws.rs.ProcessingException;
-import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.WebTarget;
@@ -79,7 +78,7 @@ public final static String SHEETS_WSDL = "/spreadsheets/?wsdl";
 	
 	@Override
 	public String createSpreadsheet(Spreadsheet sheet, String password) throws SheetsException {
-		// TODO Auto-generated method stub
+
 		if (sheet == null || password == null || sheet.getSheetId() != null || sheet.getSheetURL() != null
 				|| sheet.getRows() < 0 || sheet.getColumns() < 0) {
 			throw new SheetsException(); 
@@ -114,11 +113,10 @@ public final static String SHEETS_WSDL = "/spreadsheets/?wsdl";
 
 	@Override
 	public void deleteSpreadsheet(String sheetId, String password) throws SheetsException {
-		// TODO Auto-generated method stub
+
 		if (sheetId == null || password == null) {
 			throw new SheetsException(); 
 		}
-
 		String owner;
 		synchronized (this) {
 			Spreadsheet sheet = sheets.get(sheetId);
@@ -144,7 +142,7 @@ public final static String SHEETS_WSDL = "/spreadsheets/?wsdl";
 
 	@Override
 	public Spreadsheet getSpreadsheet(String sheetId, String userId, String password) throws SheetsException {
-		// TODO Auto-generated method stub
+
 		if (sheetId == null || userId == null) {
 			throw new SheetsException(); 
 		}
@@ -167,7 +165,6 @@ public final static String SHEETS_WSDL = "/spreadsheets/?wsdl";
 
 	@Override
 	public void shareSpreadsheet(String sheetId, String userId, String password) throws SheetsException {
-		// TODO Auto-generated method stub
 		
 		if (sheetId == null || userId == null || password == null) {
 			throw new SheetsException();
@@ -207,7 +204,7 @@ public final static String SHEETS_WSDL = "/spreadsheets/?wsdl";
 
 	@Override
 	public void unshareSpreadsheet(String sheetId, String userId, String password) throws SheetsException {
-		// TODO Auto-generated method stub
+
 		if (sheetId == null || userId == null || password == null) {
 			throw new SheetsException(); 
 		}
@@ -242,7 +239,7 @@ public final static String SHEETS_WSDL = "/spreadsheets/?wsdl";
 	@Override
 	public void updateCell(String sheetId, String cell, String rawValue, String userId, String password)
 			throws SheetsException {
-		// TODO Auto-generated method stub
+
 		if (sheetId == null || userId == null || password == null || rawValue == null) {
 			throw new SheetsException();
 		}
@@ -265,7 +262,7 @@ public final static String SHEETS_WSDL = "/spreadsheets/?wsdl";
 
 	@Override
 	public String[][] getSpreadsheetValues(String sheetId, String userId, String password) throws SheetsException {
-		// TODO Auto-generated method stub
+
 		if (sheetId == null || userId == null) {
 			throw new SheetsException(); 
 		}
@@ -329,12 +326,7 @@ public final static String SHEETS_WSDL = "/spreadsheets/?wsdl";
 
 								return values;
 							} else {
-								values = cellCache.get(String.format("%s@%s", sheetURL, range));
-								if(values != null) {
-									return values;
-								} else {
-									throw new WebApplicationException(r.getStatus());
-								}
+								throw new RuntimeException();
 							}
 
 						} catch (ProcessingException pe) {
@@ -386,10 +378,7 @@ public final static String SHEETS_WSDL = "/spreadsheets/?wsdl";
 							} catch (InterruptedException e) {
 							}
 						} catch (SheetsException e) {
-							values = cellCache.get(String.format("%s@%s", sheetURL, range));
-							if(values != null) {
-								return values;
-							}
+							throw new RuntimeException();
 						}
 					}
 				}
@@ -401,7 +390,7 @@ public final static String SHEETS_WSDL = "/spreadsheets/?wsdl";
 
 	@Override
 	public String[][] getRange(String sheetId, String userId, String userDomain, String range) throws SheetsException {
-		// TODO Auto-generated method stub
+
 		if (sheetId == null || userId == null) {
 			throw new SheetsException(); 
 		}
@@ -468,12 +457,7 @@ public final static String SHEETS_WSDL = "/spreadsheets/?wsdl";
 
 								return values;
 							} else {
-								values = cellCache.get(String.format("%s@%s", sheetURL, range));
-								if(values != null) {
-									return values;
-								} else {
-									throw new WebApplicationException(r.getStatus());
-								}
+								throw new RuntimeException();
 							}
 
 						} catch (ProcessingException pe) {
@@ -525,10 +509,7 @@ public final static String SHEETS_WSDL = "/spreadsheets/?wsdl";
 							} catch (InterruptedException e) {
 							}
 						} catch (SheetsException e) {
-							values = cellCache.get(String.format("%s@%s", sheetURL, range));
-							if(values != null) {
-								return values;
-							}
+							throw new RuntimeException();
 						}
 					}
 				}
@@ -540,7 +521,7 @@ public final static String SHEETS_WSDL = "/spreadsheets/?wsdl";
 
 	@Override
 	public void deleteUserSpreadsheets(String userId) throws SheetsException {
-		// TODO Auto-generated method stub
+
 		if (userId == null) {
 			throw new SheetsException(); 
 		}

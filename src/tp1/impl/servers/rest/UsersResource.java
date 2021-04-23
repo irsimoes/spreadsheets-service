@@ -86,7 +86,7 @@ public class UsersResource implements RestUsers {
 				throw new WebApplicationException( Status.NOT_FOUND ); //404
 			}
 		
-			if( !user.getPassword().equals( password)) {
+			if( !user.getPassword().equals(password)) {
 				throw new WebApplicationException( Status.FORBIDDEN ); //403
 			}
 		}
@@ -96,7 +96,6 @@ public class UsersResource implements RestUsers {
 
 	@Override
 	public User updateUser(String userId, String password, User user) {
-		// TODO Complete method
 		
 		User updateUser;
 		synchronized(users) {
@@ -121,7 +120,6 @@ public class UsersResource implements RestUsers {
 
 	@Override
 	public User deleteUser(String userId, String password) {
-		// TODO Complete method
 		
 		User user;
 		synchronized(users) {
@@ -129,87 +127,85 @@ public class UsersResource implements RestUsers {
 			users.remove(userId);
 		}
 		
-		URI[] uri = null;
-		while(uri == null) {
-			try {
-				uri = discovery.knownUrisOf(domain, "sheets");
-				Thread.sleep(500);
-			} catch (Exception e) {
-			}
-		}
-		
-		String serverUrl = uri[0].toString();
-		
-		short retries = 0;
-		boolean success = false;
-		
-		if(serverUrl.contains("rest")) {
-			WebTarget target = client.target( serverUrl ).path(RestSpreadsheets.PATH).path("/delete");
-			
-			while(!success && retries < MAX_RETRIES) {
-		
+		new Thread(() -> {
+			URI[] uri = null;
+			while(uri == null) {
 				try {
-					Response r = target.path(userId).request()
-					.delete();
-					
-					if( r.getStatus() != Status.NO_CONTENT.getStatusCode() ) {
-						throw new WebApplicationException(r.getStatus());
-					}
-					
-					success = true;
-
-				} catch (ProcessingException pe) {
-					retries++;
-					try { 
-						Thread.sleep(RETRY_PERIOD);
-					} catch (InterruptedException e) {
-					}
-				}
-			}
-		} else {
-			SoapSpreadsheets sheets = null;
-			
-			while(!success && retries < MAX_RETRIES) {
-				try {
-					QName QNAME = new QName(SoapSpreadsheets.NAMESPACE, SoapSpreadsheets.NAME);
-					Service service = Service.create( new URL(serverUrl + SpreadsheetsWS.SHEETS_WSDL), QNAME);
-					sheets = service.getPort( tp1.api.service.soap.SoapSpreadsheets.class);
-					success = true;
-				} catch (WebServiceException e) {
-					retries++;
-				} catch (MalformedURLException e) {
+					uri = discovery.knownUrisOf(domain, "sheets");
+					Thread.sleep(500);
+				} catch (Exception e) {
 				}
 			}
 			
-			((BindingProvider) sheets).getRequestContext().put(BindingProviderProperties.CONNECT_TIMEOUT, CONNECTION_TIMEOUT);
-			((BindingProvider) sheets).getRequestContext().put(BindingProviderProperties.REQUEST_TIMEOUT, REPLY_TIMEOUT);
+			String serverUrl = uri[0].toString();
 			
-			retries = 0; success = false;
+			short retries = 0;
+			boolean success = false;
 			
-			while(!success && retries < MAX_RETRIES) {
+			if(serverUrl.contains("rest")) {
+				WebTarget target = client.target( serverUrl ).path(RestSpreadsheets.PATH).path("/delete");
 				
-				try{
-					sheets.deleteUserSpreadsheets(userId);
-					success = true;
-				} catch(WebServiceException wse) {
-					retries++;
+				while(!success && retries < MAX_RETRIES) {
+			
 					try {
-						Thread.sleep(RETRY_PERIOD);
-					} catch (InterruptedException e) {
+						Response r = target.path(userId).request()
+						.delete();
+						
+						if( r.getStatus() != Status.NO_CONTENT.getStatusCode() ) {
+							throw new WebApplicationException(r.getStatus());
+						}
+						success = true;
+					} catch (ProcessingException pe) {
+						retries++;
+						try { 
+							Thread.sleep(RETRY_PERIOD);
+						} catch (InterruptedException e) {
+						}
 					}
-				} catch(SheetsException se) {
-					throw new WebApplicationException(Status.BAD_REQUEST);
+				}
+			} else {
+				SoapSpreadsheets sheets = null;
+				
+				while(!success && retries < MAX_RETRIES) {
+					try {
+						QName QNAME = new QName(SoapSpreadsheets.NAMESPACE, SoapSpreadsheets.NAME);
+						Service service = Service.create( new URL(serverUrl + SpreadsheetsWS.SHEETS_WSDL), QNAME);
+						sheets = service.getPort( tp1.api.service.soap.SoapSpreadsheets.class);
+						success = true;
+					} catch (WebServiceException e) {
+						retries++;
+					} catch (MalformedURLException e) {
+					}
+				}
+				
+				((BindingProvider) sheets).getRequestContext().put(BindingProviderProperties.CONNECT_TIMEOUT, CONNECTION_TIMEOUT);
+				((BindingProvider) sheets).getRequestContext().put(BindingProviderProperties.REQUEST_TIMEOUT, REPLY_TIMEOUT);
+				
+				retries = 0; success = false;
+				
+				while(!success && retries < MAX_RETRIES) {
+					
+					try{
+						sheets.deleteUserSpreadsheets(userId);
+						success = true;
+					} catch(WebServiceException wse) {
+						retries++;
+						try {
+							Thread.sleep(RETRY_PERIOD);
+						} catch (InterruptedException e) {
+						}
+					} catch(SheetsException se) {
+						throw new WebApplicationException(Status.BAD_REQUEST);
+					}
 				}
 			}
-		}
-		
+		}).start();
 		return user;
 	}
 
 
 	@Override
 	public List<User> searchUsers(String pattern) {
-		// TODO Complete method
 		
 		List<User> userList = new ArrayList<User>();
 		
@@ -227,7 +223,6 @@ public class UsersResource implements RestUsers {
 	
 	@Override
 	public boolean userExists(String userId) {
-		// TODO Auto-generated method stub
 		
 		synchronized(users) {
 			User user = users.get(userId);
