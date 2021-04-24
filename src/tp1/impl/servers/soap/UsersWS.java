@@ -88,7 +88,7 @@ public class UsersWS implements SoapUsers {
 	public User getUser(String userId, String password) throws UsersException {
 
 		User user;
-		synchronized (users) {
+//		synchronized (users) {
 			user = users.get(userId);
 
 			if (user == null) {
@@ -98,7 +98,7 @@ public class UsersWS implements SoapUsers {
 			if (!user.getPassword().equals(password)) {
 				throw new UsersException();
 			}
-		}
+//		}
 		return user;
 	}
 
@@ -138,7 +138,9 @@ public class UsersWS implements SoapUsers {
 			while (uri == null) {
 				try {
 					uri = discovery.knownUrisOf(domain, "sheets");
-					Thread.sleep(500);
+					if(uri == null) {
+						Thread.sleep(500);
+					}
 				} catch (Exception e) {
 				}
 			}
@@ -233,13 +235,13 @@ public class UsersWS implements SoapUsers {
 	@Override
 	public boolean userExists(String userId) throws UsersException {
 
-		synchronized (users) {
+//		synchronized (users) {
 			User user = users.get(userId);
 
 			if (user == null) {
 				throw new UsersException();
 			}
-		}
+//		}
 		return true;
 	}
 

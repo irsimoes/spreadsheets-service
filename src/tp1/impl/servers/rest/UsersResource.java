@@ -79,7 +79,7 @@ public class UsersResource implements RestUsers {
 	@Override
 	public User getUser(String userId, String password) {
 		User user;
-		synchronized(users) {
+//		synchronized(users) {
 			user = users.get(userId);
 		
 			if( user == null ) {
@@ -89,7 +89,7 @@ public class UsersResource implements RestUsers {
 			if( !user.getPassword().equals(password)) {
 				throw new WebApplicationException( Status.FORBIDDEN ); //403
 			}
-		}
+//		}
 		return user;
 	}
 
@@ -132,7 +132,9 @@ public class UsersResource implements RestUsers {
 			while(uri == null) {
 				try {
 					uri = discovery.knownUrisOf(domain, "sheets");
-					Thread.sleep(500);
+					if(uri == null) {
+						Thread.sleep(500);
+					}
 				} catch (Exception e) {
 				}
 			}
@@ -224,13 +226,13 @@ public class UsersResource implements RestUsers {
 	@Override
 	public boolean userExists(String userId) {
 		
-		synchronized(users) {
+//		synchronized(users) {
 			User user = users.get(userId);
 		
 			if( user == null ) {
 				throw new WebApplicationException(Status.NOT_FOUND);
 			}
-		}
+//		}
 		return true;
 	}
 

@@ -21,6 +21,7 @@ import com.sun.xml.ws.client.BindingProviderProperties;
 import jakarta.inject.Singleton;
 import jakarta.jws.WebService;
 import jakarta.ws.rs.ProcessingException;
+import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.WebTarget;
@@ -150,7 +151,7 @@ public final static String SHEETS_WSDL = "/spreadsheets/?wsdl";
 		requestUser(domain, userId, password);
 		
 		Spreadsheet sheet;
-		synchronized (this) {
+//		synchronized (this) {
 			sheet = sheets.get(sheetId);
 			if (sheet == null) {
 				throw new SheetsException();
@@ -159,7 +160,7 @@ public final static String SHEETS_WSDL = "/spreadsheets/?wsdl";
 			if(!sheet.getOwner().equals(userId)  && ((sheet.getSharedWith() == null) || (!sheet.getSharedWith().contains(String.format("%s@%s", userId, domain))))){
 				throw new SheetsException(); 
 			}
-		}
+//		}
 		return sheet;
 	}
 
@@ -174,30 +175,34 @@ public final static String SHEETS_WSDL = "/spreadsheets/?wsdl";
 		userExists(user[1], user[0]);
 
 		String owner;
-		synchronized (this) {
+//		synchronized (this) {
 			Spreadsheet sheet = sheets.get(sheetId);
 			if (sheet == null) {
 				throw new SheetsException();
 			}
 			owner = sheet.getOwner();
-		}
+//		}
 
 		requestUser(domain, owner, password);
 
 		synchronized (this) {
-			Spreadsheet sheet = sheets.get(sheetId);
+/*			Spreadsheet sheet = sheets.get(sheetId);
 			if (sheet == null) {
 				throw new SheetsException(); 
-			}
+			}*/
+			boolean firstShare = false;
 			Set<String> sharedWith = sheet.getSharedWith();
 			if (sharedWith == null) {
 				sharedWith = new HashSet<String>();
-			} else if(sharedWith.contains(userId)) {
-				throw new SheetsException(); 
+				firstShare = true;
+			} else if (sharedWith.contains(userId)) {
+				throw new WebApplicationException(Status.CONFLICT); // 409
 			}
-			
+
 			sharedWith.add(userId);
-			sheet.setSharedWith(sharedWith);
+			if (firstShare) {
+				sheet.setSharedWith(sharedWith);
+			}
 
 		}
 	}
@@ -212,23 +217,23 @@ public final static String SHEETS_WSDL = "/spreadsheets/?wsdl";
 		String[] user = userId.split("@");
 		userExists(user[1], user[0]);
 
-		String owner;
-		synchronized (this) {
+//		String owner;
+//		synchronized (this) {
 			Spreadsheet sheet = sheets.get(sheetId);
 			if (sheet == null) {
 				throw new SheetsException(); 
 			}
-			owner = sheet.getOwner();
-		}
+			String owner = sheet.getOwner();
+//		}
 
 		requestUser(domain, owner, password);
 
 
 		synchronized (this) {
-			Spreadsheet sheet = sheets.get(sheetId);
+/*			Spreadsheet sheet = sheets.get(sheetId);
 			if (sheet == null) {
 				throw new SheetsException(); 
-			}
+			}*/
 			Set<String> sharedWith = sheet.getSharedWith();
 			if(sharedWith != null) {
 				sharedWith.remove(userId);
@@ -271,7 +276,7 @@ public final static String SHEETS_WSDL = "/spreadsheets/?wsdl";
 
 		String[][] values;
 		Spreadsheet sheet;
-		synchronized (this) {
+//		synchronized (this) {
 			sheet = sheets.get(sheetId);
 			if (sheet == null) {
 				throw new SheetsException(); 
@@ -280,7 +285,7 @@ public final static String SHEETS_WSDL = "/spreadsheets/?wsdl";
 			if(!sheet.getOwner().equals(userId)  && ((sheet.getSharedWith() == null) || (!sheet.getSharedWith().contains(String.format("%s@%s", userId, domain))))){
 				throw new SheetsException(); 
 			}
-		}
+//		}
 		
 		values = SpreadsheetEngineImpl.getInstance().computeSpreadsheetValues(new AbstractSpreadsheet() {
 			@Override
@@ -399,7 +404,7 @@ public final static String SHEETS_WSDL = "/spreadsheets/?wsdl";
 		Spreadsheet sheet;
 		String user = String.format("%s@%s", userId, userDomain);
 		
-		synchronized (this) {
+//		synchronized (this) {
 			sheet = sheets.get(sheetId);
 			if (sheet == null) {
 				throw new SheetsException(); 
@@ -408,7 +413,7 @@ public final static String SHEETS_WSDL = "/spreadsheets/?wsdl";
 			if(!sheet.getOwner().equals(userId)  && ((sheet.getSharedWith() == null) || (!sheet.getSharedWith().contains(user)))){
 				throw new SheetsException(); 
 			}
-		}
+//		}
 
 		CellRange cellRange = new CellRange(range);
 		rangeValues = cellRange.extractRangeValuesFrom(sheet.getRawValues());
@@ -541,7 +546,9 @@ public final static String SHEETS_WSDL = "/spreadsheets/?wsdl";
 		while (uri == null) {
 			try {
 				uri = discovery.knownUrisOf(userDomain, "users");
-				Thread.sleep(500);
+				if(uri == null) {
+					Thread.sleep(500);
+				}
 			} catch (Exception e) {
 			}
 		}
@@ -615,7 +622,9 @@ public final static String SHEETS_WSDL = "/spreadsheets/?wsdl";
 		while (uri == null) {
 			try {
 				uri = discovery.knownUrisOf(userDomain, "users");
-				Thread.sleep(500);
+				if(uri == null) {
+					Thread.sleep(500);
+				}
 			} catch (Exception e) {
 			}
 		}
