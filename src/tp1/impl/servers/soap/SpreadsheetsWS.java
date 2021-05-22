@@ -92,7 +92,7 @@ public final static String SHEETS_WSDL = "/spreadsheets/?wsdl";
 			sheet.setSheetId(id);
 
 			String ip = InetAddress.getLocalHost().getHostAddress();
-			String sheetURL = String.format("http://%s:%s/soap/spreadsheets/%s", ip, PORT, id);
+			String sheetURL = String.format("https://%s:%s/soap/spreadsheets/%s", ip, PORT, id);
 			sheet.setSheetURL(sheetURL);
 
 			synchronized (this) {

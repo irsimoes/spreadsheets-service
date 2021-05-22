@@ -5,10 +5,15 @@ import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
-import com.sun.net.httpserver.HttpServer;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+
+import com.sun.net.httpserver.HttpsConfigurator;
+import com.sun.net.httpserver.HttpsServer;
 
 import jakarta.xml.ws.Endpoint;
 import tp1.discovery.Discovery;
+import tp1.util.InsecureHostnameVerifier;
 
 public class SpreadsheetsServer {
 
@@ -26,12 +31,18 @@ public class SpreadsheetsServer {
 	public static void main(String[] args) {
 		try {
 		String ip = InetAddress.getLocalHost().getHostAddress();
-		String serverURI = String.format("http://%s:%s/soap", ip, PORT);
+		String serverURI = String.format("https://%s:%s/soap", ip, PORT);
+		
+		HttpsURLConnection.setDefaultHostnameVerifier(new InsecureHostnameVerifier());
+		
+		HttpsConfigurator configurator = new HttpsConfigurator(SSLContext.getDefault());
 		
 		Discovery discovery = Discovery.getInstance();
 		discovery.start(args[0], SERVICE, serverURI);
 		
-		HttpServer server = HttpServer.create(new InetSocketAddress(ip, PORT), 0);
+		HttpsServer server = HttpsServer.create(new InetSocketAddress(ip, PORT), 0);
+		
+		server.setHttpsConfigurator(configurator);
 		
 		server.setExecutor(Executors.newCachedThreadPool());
 		

@@ -1,4 +1,4 @@
-package tp1.impl.servers.rest;
+package tp1.impl.servers.rest.DB;
 
 import java.net.InetAddress;
 import java.net.URI;
@@ -13,9 +13,9 @@ import org.glassfish.jersey.server.ResourceConfig;
 import tp1.discovery.Discovery;
 import tp1.util.InsecureHostnameVerifier;
 
-public class SpreadsheetsServer {
+public class DBSpreadsheetsServer {
 
-	private static Logger Log = Logger.getLogger(SpreadsheetsServer.class.getName());
+	private static Logger Log = Logger.getLogger(DBSpreadsheetsServer.class.getName());
 
 	static {
 		System.setProperty("java.net.preferIPv4Stack", "true");
@@ -24,7 +24,8 @@ public class SpreadsheetsServer {
 		
 	public static final int PORT = 8080;
 	public static final String SERVICE = "sheets";
-		
+	
+	//arg0 - domain, arg1 - boolean purgeDB, arg2 - accesskey, arg3 - apikey, arg4 - apisecret, arg5 - accesstoken 
 	public static void main(String[] args) {
 		try {
 		String ip = InetAddress.getLocalHost().getHostAddress();
@@ -37,12 +38,11 @@ public class SpreadsheetsServer {
 		discovery.start(args[0], SERVICE, serverURI);
 		
 		ResourceConfig config = new ResourceConfig();
-		config.register(new SpreadsheetsResource(args[0], discovery));
+		config.register(new DBSpreadsheetsResource(args[0], Boolean.getBoolean(args[1]), args[2], args[3], args[4], args[5], discovery));
 		JdkHttpServerFactory.createHttpServer( URI.create(serverURI), config, SSLContext.getDefault());
 
 		Log.info(String.format("%s Server ready @ %s\n",  SERVICE, serverURI));
 			
-		//More code can be executed here...
 		} catch( Exception e) {
 			Log.severe(e.getMessage());
 		}

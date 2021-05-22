@@ -1,4 +1,4 @@
-package tp1.impl.servers.rest;
+package tp1.impl.servers.rest.DB;
 
 import java.net.InetAddress;
 import java.net.MalformedURLException;
@@ -34,12 +34,13 @@ import tp1.api.service.soap.UsersException;
 import tp1.discovery.Discovery;
 import tp1.api.engine.*;
 import tp1.impl.engine.SpreadsheetEngineImpl;
+import tp1.impl.servers.rest.DB.requests.*;
 import tp1.impl.servers.soap.SpreadsheetsWS;
 import tp1.impl.servers.soap.UsersWS;
 import tp1.util.CellRange;
 
 @Singleton
-public class SpreadsheetsResource implements RestSpreadsheets {
+public class DBSpreadsheetsResource implements RestSpreadsheets {
 
 	public static final int PORT = 8080;
 	public static final int MAX_RETRIES = 3;
@@ -47,24 +48,38 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 	public static final int CONNECTION_TIMEOUT = 10000;
 	public static final int REPLY_TIMEOUT = 600;
 
-	private final Map<String, Spreadsheet> sheets = new HashMap<String, Spreadsheet>();
-	private final Map<String, Set<String>> userSheets = new HashMap<String, Set<String>>();
 	private final Map<String, String[][]> cellCache = new HashMap<String, String[][]>();
 	private static Discovery discovery;
 	private static String domain;
 	private static Client client;
+	private static CreateDirectory createDirectory;
+	private static CreateSheet createSheet;
+	private static Delete delete;
+	private static GetSheet getSheet;
 
-	public SpreadsheetsResource() {
+	public DBSpreadsheetsResource() {
 	}
 
-	public SpreadsheetsResource(String domain, Discovery discovery) {
-		SpreadsheetsResource.discovery = discovery;
-		SpreadsheetsResource.domain = domain;
+	public DBSpreadsheetsResource(String domain, boolean restart, String accessKey, String apiKey, String apiSecret, String accessTokenStr, Discovery discovery) {
+		DBSpreadsheetsResource.discovery = discovery;
+		DBSpreadsheetsResource.domain = domain;
+		String path = String.format("/%s", domain);
 
 		ClientConfig config = new ClientConfig();
 		config.property(ClientProperties.CONNECT_TIMEOUT, CONNECTION_TIMEOUT);
 		config.property(ClientProperties.READ_TIMEOUT, REPLY_TIMEOUT);
 		client = ClientBuilder.newClient(config);
+		
+		createDirectory = new CreateDirectory(apiKey, apiSecret, accessTokenStr);
+		createSheet = new CreateSheet(apiKey, apiSecret, accessTokenStr);
+		delete = new Delete(apiKey, apiSecret, accessTokenStr);
+		getSheet = new GetSheet(apiKey, apiSecret, accessTokenStr);
+		
+		if(restart) {
+			delete.execute(path);
+			createDirectory.execute(path);
+		}
+		
 	}
 
 	@Override
@@ -74,31 +89,25 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 				|| sheet.getRows() < 0 || sheet.getColumns() < 0) {
 			throw new WebApplicationException(Status.BAD_REQUEST); // 400
 		}
-
-		int status = requestUser(domain, sheet.getOwner(), password);
+		
+		String owner = sheet.getOwner();
+		int status = requestUser(domain, owner, password);
 		if (status != Status.OK.getStatusCode()) {
 			throw new WebApplicationException(Status.BAD_REQUEST); // 400
 		}
 
 		try {
-			String id = UUID.randomUUID().toString();
+			String rand = UUID.randomUUID().toString();
+			String id = String.format("%s_%s", owner, rand);
 			sheet.setSheetId(id);
 
 			String ip = InetAddress.getLocalHost().getHostAddress();
 			String sheetURL = String.format("https://%s:%s/rest/spreadsheets/%s", ip, PORT, id);
 			sheet.setSheetURL(sheetURL);
 
-			synchronized (this) {
-				sheets.put(id, sheet);
-
-				Set<String> sheetsSet = userSheets.get(sheet.getOwner());
-				if (sheetsSet == null) {
-					sheetsSet = new HashSet<String>();
-				}
-
-				sheetsSet.add(id);
-				userSheets.put(sheet.getOwner(), sheetsSet);
-			}
+			String path = String.format("/%s/%s/%s", domain, owner, rand);
+			createSheet.execute(sheet, path);
+			
 		} catch (UnknownHostException e) {
 		}
 
@@ -112,30 +121,18 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 			throw new WebApplicationException(Status.BAD_REQUEST); // 400
 		}
 
-		String owner;
-		synchronized (this) {
-			Spreadsheet sheet = sheets.get(sheetId);
-			if (sheet == null) {
-				throw new WebApplicationException(Status.NOT_FOUND); // 404
-			}
-			owner = sheet.getOwner();
+		String path = getPath(sheetId);
+		Spreadsheet sheet = getSheet.execute(path);
+		if (sheet == null) {
+			throw new WebApplicationException(Status.NOT_FOUND); // 404
 		}
 
-		int status = requestUser(domain, owner, password);
+		int status = requestUser(domain, sheet.getOwner(), password);
 		if (status != Status.OK.getStatusCode()) {
 			throw new WebApplicationException(status); // 403 or 404
 		}
 
-		synchronized (this) {
-			Spreadsheet sheet = sheets.get(sheetId);
-			if (sheet == null) {
-				throw new WebApplicationException(Status.NOT_FOUND); // 404
-			}
-			if (sheet.getOwner().equals(owner)) {
-				sheets.remove(sheetId);
-				userSheets.get(owner).remove(sheetId);
-			}
-		}
+		delete.execute(path);
 	}
 
 	@Override
@@ -150,9 +147,7 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 			throw new WebApplicationException(status); // 403 or 404
 		}
 
-		Spreadsheet sheet;
-//		synchronized (this) {
-		sheet = sheets.get(sheetId);
+		Spreadsheet sheet = getSheet.execute(getPath(sheetId));
 		if (sheet == null) {
 			throw new WebApplicationException(Status.NOT_FOUND); // 404
 		}
@@ -161,7 +156,7 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 				|| (!sheet.getSharedWith().contains(String.format("%s@%s", userId, domain))))) {
 			throw new WebApplicationException(Status.FORBIDDEN); // 403
 		}
-//		}
+
 		return sheet; // 200
 	}
 
@@ -178,9 +173,7 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 		}
 
 		String[][] values;
-		Spreadsheet sheet;
-//		synchronized (this) {
-		sheet = sheets.get(sheetId);
+		Spreadsheet sheet = getSheet.execute(getPath(sheetId));
 		if (sheet == null) {
 			throw new WebApplicationException(Status.NOT_FOUND); // 404
 		}
@@ -189,7 +182,7 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 				|| (!sheet.getSharedWith().contains(String.format("%s@%s", userId, domain))))) {
 			throw new WebApplicationException(Status.FORBIDDEN); // 403
 		}
-//		}
+
 		values = SpreadsheetEngineImpl.getInstance().computeSpreadsheetValues(new AbstractSpreadsheet() {
 			@Override
 			public int rows() {
@@ -312,19 +305,18 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 			throw new WebApplicationException(status); // 403 or 404
 		}
 
-		synchronized (this) {
-			Spreadsheet sheet = sheets.get(sheetId);
-			if (sheet == null) {
-				throw new WebApplicationException(Status.NOT_FOUND); // 404
-			}
-
-			if (!sheet.getOwner().equals(userId) && ((sheet.getSharedWith() == null)
-					|| (!sheet.getSharedWith().contains(String.format("%s@%s", userId, domain))))) {
-				throw new WebApplicationException(Status.FORBIDDEN); // 403
-			}
-
-			sheet.setCellRawValue(cell, rawValue);
+		Spreadsheet sheet = getSheet.execute(getPath(sheetId));
+		if (sheet == null) {
+			throw new WebApplicationException(Status.NOT_FOUND); // 404
 		}
+
+		if (!sheet.getOwner().equals(userId) && ((sheet.getSharedWith() == null)
+				|| (!sheet.getSharedWith().contains(String.format("%s@%s", userId, domain))))) {
+			throw new WebApplicationException(Status.FORBIDDEN); // 403
+		}
+
+		sheet.setCellRawValue(cell, rawValue);
+		createSheet.execute(sheet, getPath(sheetId));
 	}
 
 	@Override
@@ -340,39 +332,32 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 			throw new WebApplicationException(status2); // 404
 		}
 
-		String owner;
-//		synchronized (this) {
-		Spreadsheet sheet = sheets.get(sheetId);
+		String path = getPath(sheetId);
+		Spreadsheet sheet = getSheet.execute(path);
 		if (sheet == null) {
 			throw new WebApplicationException(Status.NOT_FOUND); // 404
 		}
-		owner = sheet.getOwner();
-//		}
 
-		int status = requestUser(domain, owner, password);
+		int status = requestUser(domain, sheet.getOwner(), password);
 		if (status != Status.OK.getStatusCode()) {
 			throw new WebApplicationException(status); // 403 or 404
 		}
 
-		synchronized (this) {
-			/*
-			 * sheet = sheets.get(sheetId); if (sheet == null) { throw new
-			 * WebApplicationException(Status.NOT_FOUND); // 404 }
-			 */
-			boolean firstShare = false;
-			Set<String> sharedWith = sheet.getSharedWith();
-			if (sharedWith == null) {
-				sharedWith = new HashSet<String>();
-				firstShare = true;
-			} else if (sharedWith.contains(userId)) {
-				throw new WebApplicationException(Status.CONFLICT); // 409
-			}
-
-			sharedWith.add(userId);
-			if (firstShare) {
-				sheet.setSharedWith(sharedWith);
-			}
+		boolean firstShare = false;
+		Set<String> sharedWith = sheet.getSharedWith();
+		if (sharedWith == null) {
+			sharedWith = new HashSet<String>();
+			firstShare = true;
+		} else if (sharedWith.contains(userId)) {
+			throw new WebApplicationException(Status.CONFLICT); // 409
 		}
+
+		sharedWith.add(userId);
+		if (firstShare) {
+			sheet.setSharedWith(sharedWith);
+		}
+		
+		createSheet.execute(sheet, path);
 	}
 
 	@Override
@@ -388,30 +373,24 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 			throw new WebApplicationException(status2); // 404
 		}
 
-//		String owner;
-//		synchronized (this) {
-		Spreadsheet sheet = sheets.get(sheetId);
+		String path = getPath(sheetId);
+		Spreadsheet sheet = getSheet.execute(path);
 		if (sheet == null) {
 			throw new WebApplicationException(Status.NOT_FOUND); // 404
 		}
 		String owner = sheet.getOwner();
-//		}
 
 		int status = requestUser(domain, owner, password);
 		if (status != Status.OK.getStatusCode()) {
 			throw new WebApplicationException(status); // 403 or 404
 		}
 
-		synchronized (this) {
-			/*
-			 * Spreadsheet sheet = sheets.get(sheetId); if (sheet == null) { throw new
-			 * WebApplicationException(Status.NOT_FOUND); // 404 }
-			 */
-			Set<String> sharedWith = sheet.getSharedWith();
-			if (sharedWith != null) {
-				sharedWith.remove(userId);
-			}
+		Set<String> sharedWith = sheet.getSharedWith();
+		if (sharedWith != null) {
+			sharedWith.remove(userId);
 		}
+		
+		createSheet.execute(sheet, path);
 	}
 
 	@Override
@@ -422,10 +401,8 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 		}
 
 		String[][] rangeValues;
-		Spreadsheet sheet;
 
-//		synchronized (this) {
-		sheet = sheets.get(sheetId);
+		Spreadsheet sheet = getSheet.execute(getPath(sheetId));
 		if (sheet == null) {
 			throw new WebApplicationException(Status.NOT_FOUND); // 404
 		}
@@ -434,7 +411,6 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 				|| (!sheet.getSharedWith().contains(String.format("%s@%s", userId, userDomain))))) {
 			throw new WebApplicationException(Status.FORBIDDEN); // 403
 		}
-//		}
 
 		CellRange cellRange = new CellRange(range);
 		rangeValues = cellRange.extractRangeValuesFrom(sheet.getRawValues());
@@ -553,15 +529,8 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 		if (userId == null) {
 			throw new WebApplicationException(Status.BAD_REQUEST); // 400
 		}
-		synchronized (this) {
-			Set<String> sheetIds = userSheets.get(userId);
-			if (sheetIds != null) {
-				for (String id : sheetIds) {
-					sheets.remove(id);
-				}
-				userSheets.remove(userId);
-			}
-		}
+		String path = String.format("/%s/%s", domain, userId);
+		delete.execute(path);
 	}
 
 	private int requestUser(String userDomain, String userId, String password) {
@@ -715,5 +684,17 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 		}
 		return 0;
 	}
+	
+	private String getPath(String sheetId) {
+		if(!sheetId.contains("_")) {
+			throw new WebApplicationException(Status.NOT_FOUND); //404
+		}
+		String[] sheet = sheetId.split("_");
+		String owner = sheet[0];
+		String id = sheet[1];
+		return String.format("/%s/%s/%s", domain, owner, id);
+	}
+	
+	
 
 }

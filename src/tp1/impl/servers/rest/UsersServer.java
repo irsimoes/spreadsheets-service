@@ -4,10 +4,14 @@ import java.net.InetAddress;
 import java.net.URI;
 import java.util.logging.Logger;
 
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 
 import tp1.discovery.Discovery;
+import tp1.util.InsecureHostnameVerifier;
 
 public class UsersServer {
 
@@ -24,15 +28,17 @@ public class UsersServer {
 	public static void main(String[] args) {
 		try {
 		String ip = InetAddress.getLocalHost().getHostAddress();
+		
+		HttpsURLConnection.setDefaultHostnameVerifier(new InsecureHostnameVerifier());
 
-		String serverURI = String.format("http://%s:%s/rest", ip, PORT);
+		String serverURI = String.format("https://%s:%s/rest", ip, PORT);
 		
 		Discovery discovery = Discovery.getInstance();
 		discovery.start(args[0], SERVICE, serverURI);
 
 		ResourceConfig config = new ResourceConfig();
 		config.register(new UsersResource(args[0], discovery));
-		JdkHttpServerFactory.createHttpServer( URI.create(serverURI), config);
+		JdkHttpServerFactory.createHttpServer( URI.create(serverURI), config, SSLContext.getDefault());
 		
 		Log.info(String.format("%s Server ready @ %s\n",  SERVICE, serverURI));
 		
@@ -40,5 +46,4 @@ public class UsersServer {
 			Log.severe(e.getMessage());
 		}
 	}
-	
 }
