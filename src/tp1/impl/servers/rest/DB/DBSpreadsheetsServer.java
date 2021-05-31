@@ -38,7 +38,7 @@ public class DBSpreadsheetsServer {
 		discovery.start(args[0], SERVICE, serverURI);
 		
 		ResourceConfig config = new ResourceConfig();
-		config.register(new DBSpreadsheetsResource(args[0], Boolean.getBoolean(args[1]), args[2], args[3], args[4], args[5], discovery));
+		config.register(new DBSpreadsheetsResource(args[0], Boolean.parseBoolean(args[1]), args[2], args[3], args[4], args[5], discovery));
 		JdkHttpServerFactory.createHttpServer( URI.create(serverURI), config, SSLContext.getDefault());
 
 		Log.info(String.format("%s Server ready @ %s\n",  SERVICE, serverURI));

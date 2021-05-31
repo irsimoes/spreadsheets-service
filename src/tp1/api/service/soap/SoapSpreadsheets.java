@@ -100,7 +100,7 @@ public interface SoapSpreadsheets {
 	 * 
 	 * @throws SheetsException otherwise
 	 */
-	String[][] getRange(String sheetId, String userId, String domain, String range) throws SheetsException;
+	String[][] getRange(String sheetId, String userId, String domain, String range, String serverSecret) throws SheetsException;
 	
 	/**
 	 * Removes all the spreadsheets the deleted user had.
@@ -110,5 +110,5 @@ public interface SoapSpreadsheets {
 	 * @throws SheetsException otherwise
 	 */
 
-	void deleteUserSpreadsheets(String userId) throws SheetsException;
+	void deleteUserSpreadsheets(String userId, String serverSecret) throws SheetsException;
 }

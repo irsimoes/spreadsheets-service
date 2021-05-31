@@ -41,15 +41,16 @@ public class UsersResource implements RestUsers {
 
 	private final Map<String,User> users = new HashMap<String, User>();
 	private static Discovery discovery;
-	private static String domain;
+	private static String domain, serverSecret;
 	private static Client client;
 	
 	public UsersResource() {
 	}
 
-	public UsersResource(String domain, Discovery discovery) {
+	public UsersResource(String domain, String serverSecret, Discovery discovery) {
 		UsersResource.domain = domain;
 		UsersResource.discovery = discovery;
+		UsersResource.serverSecret = serverSecret;
 		
 		ClientConfig config = new ClientConfig();
 		config.property(ClientProperties.CONNECT_TIMEOUT, CONNECTION_TIMEOUT);
@@ -150,7 +151,7 @@ public class UsersResource implements RestUsers {
 				while(!success && retries < MAX_RETRIES) {
 			
 					try {
-						Response r = target.path(userId).request()
+						Response r = target.path(userId).queryParam("serverSecret", serverSecret).request()
 						.delete();
 						
 						if( r.getStatus() != Status.NO_CONTENT.getStatusCode() ) {
@@ -188,7 +189,7 @@ public class UsersResource implements RestUsers {
 				while(!success && retries < MAX_RETRIES) {
 					
 					try{
-						sheets.deleteUserSpreadsheets(userId);
+						sheets.deleteUserSpreadsheets(userId, serverSecret);
 						success = true;
 					} catch(WebServiceException wse) {
 						retries++;
@@ -224,7 +225,11 @@ public class UsersResource implements RestUsers {
 	}
 	
 	@Override
-	public boolean userExists(String userId) {
+	public boolean userExists(String userId, String serverSecret) {
+		
+		if(!serverSecret.equals(UsersResource.serverSecret)) {
+			throw new WebApplicationException(Status.FORBIDDEN);
+		}
 		
 //		synchronized(users) {
 			User user = users.get(userId);

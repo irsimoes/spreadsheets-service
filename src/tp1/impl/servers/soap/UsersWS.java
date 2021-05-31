@@ -50,15 +50,17 @@ public class UsersWS implements SoapUsers {
 
 	private final Map<String, User> users = new HashMap<String, User>();
 	private static Discovery discovery;
-	private static String domain;
+	private static String domain, serverSecret;
 	private static Client client;
 
 	public UsersWS() {
 	}
 
-	public UsersWS(Discovery discovery, String domain) {
+	public UsersWS(String domain, String serverSecret, Discovery discovery) {
 		UsersWS.discovery = discovery;
 		UsersWS.domain = domain;
+		UsersWS.serverSecret = serverSecret;
+		
 		ClientConfig config = new ClientConfig();
 		config.property(ClientProperties.CONNECT_TIMEOUT, CONNECTION_TIMEOUT);
 		config.property(ClientProperties.READ_TIMEOUT, REPLY_TIMEOUT);
@@ -155,7 +157,7 @@ public class UsersWS implements SoapUsers {
 				while (!success && retries < MAX_RETRIES) {
 
 					try {
-						Response r = target.path(userId).request().delete();
+						Response r = target.path(userId).queryParam("serverSecret", serverSecret).request().delete();
 
 						if (r.getStatus() != Status.NO_CONTENT.getStatusCode()) {
 							throw new WebApplicationException(r.getStatus());
@@ -197,7 +199,7 @@ public class UsersWS implements SoapUsers {
 				while (!success && retries < MAX_RETRIES) {
 
 					try {
-						sheets.deleteUserSpreadsheets(userId);
+						sheets.deleteUserSpreadsheets(userId, serverSecret);
 						success = true;
 					} catch (WebServiceException wse) {
 						retries++;
@@ -233,8 +235,11 @@ public class UsersWS implements SoapUsers {
 	}
 
 	@Override
-	public boolean userExists(String userId) throws UsersException {
+	public boolean userExists(String userId, String serverSecret) throws UsersException {
 
+		if(!serverSecret.equals(UsersWS.serverSecret)) {
+			throw new UsersException();
+		}
 //		synchronized (users) {
 			User user = users.get(userId);
 

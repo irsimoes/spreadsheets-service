@@ -51,15 +51,16 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 	private final Map<String, Set<String>> userSheets = new HashMap<String, Set<String>>();
 	private final Map<String, String[][]> cellCache = new HashMap<String, String[][]>();
 	private static Discovery discovery;
-	private static String domain;
+	private static String domain, serverSecret;
 	private static Client client;
 
 	public SpreadsheetsResource() {
 	}
 
-	public SpreadsheetsResource(String domain, Discovery discovery) {
+	public SpreadsheetsResource(String domain, String serverSecret, Discovery discovery) {
 		SpreadsheetsResource.discovery = discovery;
 		SpreadsheetsResource.domain = domain;
+		SpreadsheetsResource.serverSecret = serverSecret;
 
 		ClientConfig config = new ClientConfig();
 		config.property(ClientProperties.CONNECT_TIMEOUT, CONNECTION_TIMEOUT);
@@ -225,7 +226,7 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 
 						try {
 							Response r = target.queryParam("userId", sheet.getOwner()).queryParam("userDomain", domain)
-									.queryParam("range", range).request().accept(MediaType.APPLICATION_JSON).get();
+									.queryParam("range", range).queryParam("serverSecret", serverSecret).request().accept(MediaType.APPLICATION_JSON).get();
 
 							String[][] values;
 							if (r.getStatus() == Status.OK.getStatusCode() && r.hasEntity()) {
@@ -280,7 +281,7 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 					while (!success && retries < MAX_RETRIES) {
 
 						try {
-							values = sheets.getRange(sheetId, sheet.getOwner(), domain, range);
+							values = sheets.getRange(sheetId, sheet.getOwner(), domain, range, serverSecret);
 							success = true;
 							cellCache.put(String.format("%s@%s", sheetURL, range), values);
 						} catch (WebServiceException wse) {
@@ -415,8 +416,12 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 	}
 
 	@Override
-	public String[][] getRange(String sheetId, String userId, String userDomain, String range) {
+	public String[][] getRange(String sheetId, String userId, String userDomain, String range, String serverSecret) {
 
+		if(!serverSecret.equals(SpreadsheetsResource.serverSecret)) {
+			throw new WebApplicationException(Status.FORBIDDEN);
+		}
+		
 		if (sheetId == null || userId == null) {
 			throw new WebApplicationException(Status.BAD_REQUEST); // 400
 		}
@@ -474,7 +479,7 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 
 						try {
 							Response r = target.queryParam("userId", sheet.getOwner()).queryParam("userDomain", domain)
-									.queryParam("range", range).request().accept(MediaType.APPLICATION_JSON).get();
+									.queryParam("range", range).queryParam("serverSecret", SpreadsheetsResource.serverSecret).request().accept(MediaType.APPLICATION_JSON).get();
 
 							String[][] values;
 							if (r.getStatus() == Status.OK.getStatusCode() && r.hasEntity()) {
@@ -526,7 +531,7 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 					while (!success && retries < MAX_RETRIES) {
 
 						try {
-							values = sheets.getRange(sheetId, sheet.getOwner(), domain, range);
+							values = sheets.getRange(sheetId, sheet.getOwner(), domain, range, SpreadsheetsResource.serverSecret);
 							success = true;
 							cellCache.put(String.format("%s@%s", sheetURL, range), values);
 						} catch (WebServiceException wse) {
@@ -548,8 +553,12 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 	}
 
 	@Override
-	public void deleteUserSpreadsheets(String userId) {
+	public void deleteUserSpreadsheets(String userId, String serverSecret) {
 
+		if(!serverSecret.equals(SpreadsheetsResource.serverSecret)) {
+			throw new WebApplicationException(Status.FORBIDDEN);
+		}
+		
 		if (userId == null) {
 			throw new WebApplicationException(Status.BAD_REQUEST); // 400
 		}
@@ -663,7 +672,7 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 
 			while (retries < MAX_RETRIES) {
 				try {
-					Response r = target.path("exists").path(userId).request().accept(MediaType.APPLICATION_JSON).get();
+					Response r = target.path("exists").path(userId).queryParam("serverSecret", serverSecret).request().accept(MediaType.APPLICATION_JSON).get();
 
 					return r.getStatus();
 
@@ -700,7 +709,7 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 
 			while (!success && retries < MAX_RETRIES) {
 				try {
-					users.userExists(userId);
+					users.userExists(userId, serverSecret);
 					success = true;
 				} catch (WebServiceException wse) {
 					retries++;

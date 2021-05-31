@@ -61,15 +61,16 @@ public final static String SHEETS_WSDL = "/spreadsheets/?wsdl";
 	private final Map<String, Set<String>> userSheets = new HashMap<String, Set<String>>();
 	private final Map<String, String[][]> cellCache = new HashMap<String, String[][]>();
 	private static Discovery discovery;
-	private static String domain;
+	private static String domain, serverSecret;
 	private static Client client;
 
 	public SpreadsheetsWS() {
 	}
 
-	public SpreadsheetsWS(Discovery discovery, String domain) {
+	public SpreadsheetsWS(String domain, String serverSecret, Discovery discovery) {
 		SpreadsheetsWS.discovery = discovery;
 		SpreadsheetsWS.domain = domain;
+		SpreadsheetsWS.serverSecret = serverSecret;
 		
 		ClientConfig config = new ClientConfig();
 		config.property(ClientProperties.CONNECT_TIMEOUT, CONNECTION_TIMEOUT);
@@ -321,7 +322,7 @@ public final static String SHEETS_WSDL = "/spreadsheets/?wsdl";
 					while (retries < MAX_RETRIES) {
 
 						try {
-							Response r = target.queryParam("userId", sheet.getOwner()).queryParam("userDomain", domain).queryParam("range", range).request()
+							Response r = target.queryParam("userId", sheet.getOwner()).queryParam("userDomain", domain).queryParam("range", range).queryParam("serverSecret", serverSecret).request()
 									.accept(MediaType.APPLICATION_JSON).get();
 							
 							String[][] values;
@@ -373,7 +374,7 @@ public final static String SHEETS_WSDL = "/spreadsheets/?wsdl";
 					while(!success && retries < MAX_RETRIES) {
 						
 						try{
-							values = sheets.getRange(sheetId, sheet.getOwner(), domain, range);
+							values = sheets.getRange(sheetId, sheet.getOwner(), domain, range, serverSecret);
 							success = true;
 							cellCache.put(String.format("%s@%s", sheetURL, range), values);
 						} catch(WebServiceException wse) {
@@ -394,8 +395,12 @@ public final static String SHEETS_WSDL = "/spreadsheets/?wsdl";
 	}
 
 	@Override
-	public String[][] getRange(String sheetId, String userId, String userDomain, String range) throws SheetsException {
-
+	public String[][] getRange(String sheetId, String userId, String userDomain, String range, String serverSecret) throws SheetsException {
+		
+		if (!serverSecret.equals(SpreadsheetsWS.serverSecret)) {
+			throw new SheetsException();
+		}
+		
 		if (sheetId == null || userId == null) {
 			throw new SheetsException(); 
 		}
@@ -452,7 +457,8 @@ public final static String SHEETS_WSDL = "/spreadsheets/?wsdl";
 					while (retries < MAX_RETRIES) {
 
 						try {
-							Response r = target.queryParam("userId", sheet.getOwner()).queryParam("userDomain", domain).queryParam("range", range).request()
+							Response r = target.queryParam("userId", sheet.getOwner()).queryParam("userDomain", domain).queryParam("range", range)
+									.queryParam("serverSecret", SpreadsheetsWS.serverSecret).request()
 									.accept(MediaType.APPLICATION_JSON).get();
 							
 							String[][] values;
@@ -504,7 +510,7 @@ public final static String SHEETS_WSDL = "/spreadsheets/?wsdl";
 					while(!success && retries < MAX_RETRIES) {
 						
 						try{
-							values = sheets.getRange(sheetId, sheet.getOwner(), domain, range);
+							values = sheets.getRange(sheetId, sheet.getOwner(), domain, range, SpreadsheetsWS.serverSecret);
 							success = true;
 							cellCache.put(String.format("%s@%s", sheetURL, range), values);
 						} catch(WebServiceException wse) {
@@ -525,8 +531,11 @@ public final static String SHEETS_WSDL = "/spreadsheets/?wsdl";
 	}
 
 	@Override
-	public void deleteUserSpreadsheets(String userId) throws SheetsException {
-
+	public void deleteUserSpreadsheets(String userId, String serverSecret) throws SheetsException {
+		if (!serverSecret.equals(SpreadsheetsWS.serverSecret)) {
+			throw new SheetsException();
+		}
+		
 		if (userId == null) {
 			throw new SheetsException(); 
 		}
@@ -638,7 +647,7 @@ public final static String SHEETS_WSDL = "/spreadsheets/?wsdl";
 
 			while (!success && retries < MAX_RETRIES) {
 				try {
-					Response r = target.path("exists").path(userId).request()
+					Response r = target.path("exists").path(userId).queryParam("serverSecret", serverSecret).request()
 							.accept(MediaType.APPLICATION_JSON).get();
 
 					if(r.getStatus() != Status.OK.getStatusCode()){
@@ -676,7 +685,7 @@ public final static String SHEETS_WSDL = "/spreadsheets/?wsdl";
 			
 			while(!success && retries < MAX_RETRIES) {
 				try{
-					users.userExists(userId);
+					users.userExists(userId, serverSecret);
 					success = true;
 				} catch(WebServiceException wse) {
 					retries++;

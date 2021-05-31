@@ -99,6 +99,6 @@ public interface RestUsers {
 	@GET
 	@Path("/exists/{userId}")
 	@Produces(MediaType.APPLICATION_JSON)
-	boolean userExists(@PathParam("userId") String userId);
+	boolean userExists(@PathParam("userId") String userId, @QueryParam("serverSecret") String serverSecret);
 
 }

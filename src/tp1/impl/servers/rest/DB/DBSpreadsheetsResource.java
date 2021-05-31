@@ -50,7 +50,7 @@ public class DBSpreadsheetsResource implements RestSpreadsheets {
 
 	private final Map<String, String[][]> cellCache = new HashMap<String, String[][]>();
 	private static Discovery discovery;
-	private static String domain;
+	private static String domain, serverSecret;
 	private static Client client;
 	private static CreateDirectory createDirectory;
 	private static CreateSheet createSheet;
@@ -60,9 +60,10 @@ public class DBSpreadsheetsResource implements RestSpreadsheets {
 	public DBSpreadsheetsResource() {
 	}
 
-	public DBSpreadsheetsResource(String domain, boolean restart, String accessKey, String apiKey, String apiSecret, String accessTokenStr, Discovery discovery) {
+	public DBSpreadsheetsResource(String domain, boolean restart, String serverSecret, String apiKey, String apiSecret, String accessTokenStr, Discovery discovery) {
 		DBSpreadsheetsResource.discovery = discovery;
 		DBSpreadsheetsResource.domain = domain;
+		DBSpreadsheetsResource.serverSecret = serverSecret;
 		String path = String.format("/%s", domain);
 
 		ClientConfig config = new ClientConfig();
@@ -218,7 +219,7 @@ public class DBSpreadsheetsResource implements RestSpreadsheets {
 
 						try {
 							Response r = target.queryParam("userId", sheet.getOwner()).queryParam("userDomain", domain)
-									.queryParam("range", range).request().accept(MediaType.APPLICATION_JSON).get();
+									.queryParam("range", range).queryParam("serverSecret", serverSecret).request().accept(MediaType.APPLICATION_JSON).get();
 
 							String[][] values;
 							if (r.getStatus() == Status.OK.getStatusCode() && r.hasEntity()) {
@@ -273,7 +274,7 @@ public class DBSpreadsheetsResource implements RestSpreadsheets {
 					while (!success && retries < MAX_RETRIES) {
 
 						try {
-							values = sheets.getRange(sheetId, sheet.getOwner(), domain, range);
+							values = sheets.getRange(sheetId, sheet.getOwner(), domain, range, serverSecret);
 							success = true;
 							cellCache.put(String.format("%s@%s", sheetURL, range), values);
 						} catch (WebServiceException wse) {
@@ -394,8 +395,12 @@ public class DBSpreadsheetsResource implements RestSpreadsheets {
 	}
 
 	@Override
-	public String[][] getRange(String sheetId, String userId, String userDomain, String range) {
+	public String[][] getRange(String sheetId, String userId, String userDomain, String range, String serverSecret) {
 
+		if(!serverSecret.equals(DBSpreadsheetsResource.serverSecret)) {
+			throw new WebApplicationException(Status.FORBIDDEN);
+		}
+		
 		if (sheetId == null || userId == null) {
 			throw new WebApplicationException(Status.BAD_REQUEST); // 400
 		}
@@ -450,7 +455,7 @@ public class DBSpreadsheetsResource implements RestSpreadsheets {
 
 						try {
 							Response r = target.queryParam("userId", sheet.getOwner()).queryParam("userDomain", domain)
-									.queryParam("range", range).request().accept(MediaType.APPLICATION_JSON).get();
+									.queryParam("range", range).queryParam("serverSecret", DBSpreadsheetsResource.serverSecret).request().accept(MediaType.APPLICATION_JSON).get();
 
 							String[][] values;
 							if (r.getStatus() == Status.OK.getStatusCode() && r.hasEntity()) {
@@ -502,7 +507,7 @@ public class DBSpreadsheetsResource implements RestSpreadsheets {
 					while (!success && retries < MAX_RETRIES) {
 
 						try {
-							values = sheets.getRange(sheetId, sheet.getOwner(), domain, range);
+							values = sheets.getRange(sheetId, sheet.getOwner(), domain, range, DBSpreadsheetsResource.serverSecret);
 							success = true;
 							cellCache.put(String.format("%s@%s", sheetURL, range), values);
 						} catch (WebServiceException wse) {
@@ -524,8 +529,12 @@ public class DBSpreadsheetsResource implements RestSpreadsheets {
 	}
 
 	@Override
-	public void deleteUserSpreadsheets(String userId) {
+	public void deleteUserSpreadsheets(String userId, String serverSecret) {
 
+		if(!serverSecret.equals(DBSpreadsheetsResource.serverSecret)) {
+			throw new WebApplicationException(Status.FORBIDDEN);
+		}
+		
 		if (userId == null) {
 			throw new WebApplicationException(Status.BAD_REQUEST); // 400
 		}
@@ -632,7 +641,7 @@ public class DBSpreadsheetsResource implements RestSpreadsheets {
 
 			while (retries < MAX_RETRIES) {
 				try {
-					Response r = target.path("exists").path(userId).request().accept(MediaType.APPLICATION_JSON).get();
+					Response r = target.path("exists").path(userId).queryParam("serverSecret", serverSecret).request().accept(MediaType.APPLICATION_JSON).get();
 
 					return r.getStatus();
 
@@ -669,7 +678,7 @@ public class DBSpreadsheetsResource implements RestSpreadsheets {
 
 			while (!success && retries < MAX_RETRIES) {
 				try {
-					users.userExists(userId);
+					users.userExists(userId, serverSecret);
 					success = true;
 				} catch (WebServiceException wse) {
 					retries++;

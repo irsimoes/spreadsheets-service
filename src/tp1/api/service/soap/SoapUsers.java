@@ -61,5 +61,5 @@ public interface SoapUsers {
 	 * @throws UsersException otherwise
 	 */
 	@WebMethod
-	boolean userExists(String userId) throws UsersException;
+	boolean userExists(String userId, String userServer) throws UsersException;
 }

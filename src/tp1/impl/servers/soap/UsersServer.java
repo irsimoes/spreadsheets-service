@@ -46,7 +46,7 @@ public class UsersServer {
 		
 		server.setExecutor(Executors.newCachedThreadPool());
 		
-		Endpoint soapUsersEndpoint = Endpoint.create(new UsersWS(discovery, args[0]));
+		Endpoint soapUsersEndpoint = Endpoint.create(new UsersWS(args[0], args[1], discovery));
 		
 		soapUsersEndpoint.publish(server.createContext(SOAP_USERS_PATH));
 		
