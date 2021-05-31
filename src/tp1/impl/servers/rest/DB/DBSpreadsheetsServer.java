@@ -25,7 +25,7 @@ public class DBSpreadsheetsServer {
 	public static final int PORT = 8080;
 	public static final String SERVICE = "sheets";
 	
-	//arg0 - domain, arg1 - boolean purgeDB, arg2 - accesskey, arg3 - apikey, arg4 - apisecret, arg5 - accesstoken 
+	//arg0 - domain, arg1 - boolean purgeDB, arg2 - serverSecret, arg3 - DBAPIkey, arg4 - DBAPISecret, arg5 - DBAccessToken, arg6 - GoogleAPIKey
 	public static void main(String[] args) {
 		try {
 		String ip = InetAddress.getLocalHost().getHostAddress();
@@ -38,7 +38,7 @@ public class DBSpreadsheetsServer {
 		discovery.start(args[0], SERVICE, serverURI);
 		
 		ResourceConfig config = new ResourceConfig();
-		config.register(new DBSpreadsheetsResource(args[0], Boolean.parseBoolean(args[1]), args[2], args[3], args[4], args[5], discovery));
+		config.register(new DBSpreadsheetsResource(args[0], Boolean.parseBoolean(args[1]), args[2], args[3], args[4], args[5], args[6], discovery));
 		JdkHttpServerFactory.createHttpServer( URI.create(serverURI), config, SSLContext.getDefault());
 
 		Log.info(String.format("%s Server ready @ %s\n",  SERVICE, serverURI));

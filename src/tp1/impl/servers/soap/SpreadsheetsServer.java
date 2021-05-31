@@ -46,7 +46,7 @@ public class SpreadsheetsServer {
 		
 		server.setExecutor(Executors.newCachedThreadPool());
 		
-		Endpoint soapUsersEndpoint = Endpoint.create(new SpreadsheetsWS(args[0], args[1], discovery));
+		Endpoint soapUsersEndpoint = Endpoint.create(new SpreadsheetsWS(args[0], args[1], args[2], discovery));
 		
 		soapUsersEndpoint.publish(server.createContext(SOAP_SHEETS_PATH));
 		
@@ -54,7 +54,6 @@ public class SpreadsheetsServer {
 
 		Log.info(String.format("%s Server ready @ %s\n",  SERVICE, serverURI));
 			
-		//More code can be executed here...
 		} catch( Exception e) {
 			Log.severe(e.getMessage());
 		}

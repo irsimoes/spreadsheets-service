@@ -33,6 +33,7 @@ import tp1.api.service.soap.SoapUsers;
 import tp1.api.service.soap.UsersException;
 import tp1.discovery.Discovery;
 import tp1.api.engine.*;
+import tp1.api.replies.GoogleSheetValuesReturn;
 import tp1.impl.engine.SpreadsheetEngineImpl;
 import tp1.impl.servers.soap.SpreadsheetsWS;
 import tp1.impl.servers.soap.UsersWS;
@@ -46,21 +47,23 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 	public static final long RETRY_PERIOD = 1000;
 	public static final int CONNECTION_TIMEOUT = 10000;
 	public static final int REPLY_TIMEOUT = 600;
+	public static final String GOOGLE_SHEETS = "https://sheets.googleapis.com";
 
 	private final Map<String, Spreadsheet> sheets = new HashMap<String, Spreadsheet>();
 	private final Map<String, Set<String>> userSheets = new HashMap<String, Set<String>>();
 	private final Map<String, String[][]> cellCache = new HashMap<String, String[][]>();
 	private static Discovery discovery;
-	private static String domain, serverSecret;
+	private static String domain, serverSecret, googleKey;
 	private static Client client;
 
 	public SpreadsheetsResource() {
 	}
 
-	public SpreadsheetsResource(String domain, String serverSecret, Discovery discovery) {
+	public SpreadsheetsResource(String domain, String serverSecret, String googleKey, Discovery discovery) {
 		SpreadsheetsResource.discovery = discovery;
 		SpreadsheetsResource.domain = domain;
 		SpreadsheetsResource.serverSecret = serverSecret;
+		SpreadsheetsResource.googleKey = googleKey;
 
 		ClientConfig config = new ClientConfig();
 		config.property(ClientProperties.CONNECT_TIMEOUT, CONNECTION_TIMEOUT);
@@ -151,9 +154,7 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 			throw new WebApplicationException(status); // 403 or 404
 		}
 
-		Spreadsheet sheet;
-//		synchronized (this) {
-		sheet = sheets.get(sheetId);
+		Spreadsheet sheet = sheets.get(sheetId);
 		if (sheet == null) {
 			throw new WebApplicationException(Status.NOT_FOUND); // 404
 		}
@@ -162,7 +163,7 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 				|| (!sheet.getSharedWith().contains(String.format("%s@%s", userId, domain))))) {
 			throw new WebApplicationException(Status.FORBIDDEN); // 403
 		}
-//		}
+		
 		return sheet; // 200
 	}
 
@@ -178,10 +179,7 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 			throw new WebApplicationException(status); // 403 or 404
 		}
 
-		String[][] values;
-		Spreadsheet sheet;
-//		synchronized (this) {
-		sheet = sheets.get(sheetId);
+		Spreadsheet sheet = sheets.get(sheetId);
 		if (sheet == null) {
 			throw new WebApplicationException(Status.NOT_FOUND); // 404
 		}
@@ -190,8 +188,8 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 				|| (!sheet.getSharedWith().contains(String.format("%s@%s", userId, domain))))) {
 			throw new WebApplicationException(Status.FORBIDDEN); // 403
 		}
-//		}
-		values = SpreadsheetEngineImpl.getInstance().computeSpreadsheetValues(new AbstractSpreadsheet() {
+
+		String[][] values = SpreadsheetEngineImpl.getInstance().computeSpreadsheetValues(new AbstractSpreadsheet() {
 			@Override
 			public int rows() {
 				return sheet.getRows();
@@ -218,84 +216,7 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 
 			@Override
 			public String[][] getRangeValues(String sheetURL, String range) {
-				short retries = 0;
-
-				if (sheetURL.contains("rest")) {
-					WebTarget target = client.target(sheetURL).path("/range");
-					while (retries < MAX_RETRIES) {
-
-						try {
-							Response r = target.queryParam("userId", sheet.getOwner()).queryParam("userDomain", domain)
-									.queryParam("range", range).queryParam("serverSecret", serverSecret).request().accept(MediaType.APPLICATION_JSON).get();
-
-							String[][] values;
-							if (r.getStatus() == Status.OK.getStatusCode() && r.hasEntity()) {
-								values = r.readEntity(String[][].class);
-								cellCache.put(String.format("%s@%s", sheetURL, range), values);
-
-								return values;
-							} else {
-								values = cellCache.get(String.format("%s@%s", sheetURL, range));
-								throw new WebApplicationException(r.getStatus());
-							}
-
-						} catch (ProcessingException pe) {
-							retries++;
-							try {
-								Thread.sleep(RETRY_PERIOD);
-							} catch (InterruptedException e) {
-							}
-						}
-					}
-				} else {
-
-					SoapSpreadsheets sheets = null;
-
-					String[] aux = sheetURL.split("/spreadsheets/");
-					String serverUrl = aux[0];
-					String sheetId = aux[1];
-
-					boolean success = false;
-
-					while (!success && retries < MAX_RETRIES) {
-						try {
-							QName QNAME = new QName(SoapSpreadsheets.NAMESPACE, SoapSpreadsheets.NAME);
-							Service service = Service.create(new URL(serverUrl + SpreadsheetsWS.SHEETS_WSDL), QNAME);
-							sheets = service.getPort(tp1.api.service.soap.SoapSpreadsheets.class);
-							success = true;
-						} catch (WebServiceException e) {
-							retries++;
-						} catch (MalformedURLException e) {
-						}
-					}
-
-					((BindingProvider) sheets).getRequestContext().put(BindingProviderProperties.CONNECT_TIMEOUT,
-							CONNECTION_TIMEOUT);
-					((BindingProvider) sheets).getRequestContext().put(BindingProviderProperties.REQUEST_TIMEOUT,
-							REPLY_TIMEOUT);
-
-					retries = 0;
-					success = false;
-
-					String[][] values;
-					while (!success && retries < MAX_RETRIES) {
-
-						try {
-							values = sheets.getRange(sheetId, sheet.getOwner(), domain, range, serverSecret);
-							success = true;
-							cellCache.put(String.format("%s@%s", sheetURL, range), values);
-						} catch (WebServiceException wse) {
-							retries++;
-							try {
-								Thread.sleep(RETRY_PERIOD);
-							} catch (InterruptedException e) {
-							}
-						} catch (SheetsException e) {
-							throw new WebApplicationException(Status.BAD_REQUEST);
-						}
-					}
-				}
-				return cellCache.get(String.format("%s@%s", sheetURL, range));
+				return importRangeValues(sheetURL, range, sheet.getOwner());
 			}
 		});
 		return values; // 200
@@ -341,14 +262,12 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 			throw new WebApplicationException(status2); // 404
 		}
 
-		String owner;
-//		synchronized (this) {
 		Spreadsheet sheet = sheets.get(sheetId);
 		if (sheet == null) {
 			throw new WebApplicationException(Status.NOT_FOUND); // 404
 		}
-		owner = sheet.getOwner();
-//		}
+		String owner = sheet.getOwner();
+
 
 		int status = requestUser(domain, owner, password);
 		if (status != Status.OK.getStatusCode()) {
@@ -356,10 +275,6 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 		}
 
 		synchronized (this) {
-			/*
-			 * sheet = sheets.get(sheetId); if (sheet == null) { throw new
-			 * WebApplicationException(Status.NOT_FOUND); // 404 }
-			 */
 			boolean firstShare = false;
 			Set<String> sharedWith = sheet.getSharedWith();
 			if (sharedWith == null) {
@@ -389,14 +304,11 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 			throw new WebApplicationException(status2); // 404
 		}
 
-//		String owner;
-//		synchronized (this) {
 		Spreadsheet sheet = sheets.get(sheetId);
 		if (sheet == null) {
 			throw new WebApplicationException(Status.NOT_FOUND); // 404
 		}
 		String owner = sheet.getOwner();
-//		}
 
 		int status = requestUser(domain, owner, password);
 		if (status != Status.OK.getStatusCode()) {
@@ -404,10 +316,6 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 		}
 
 		synchronized (this) {
-			/*
-			 * Spreadsheet sheet = sheets.get(sheetId); if (sheet == null) { throw new
-			 * WebApplicationException(Status.NOT_FOUND); // 404 }
-			 */
 			Set<String> sharedWith = sheet.getSharedWith();
 			if (sharedWith != null) {
 				sharedWith.remove(userId);
@@ -426,11 +334,7 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 			throw new WebApplicationException(Status.BAD_REQUEST); // 400
 		}
 
-		String[][] rangeValues;
-		Spreadsheet sheet;
-
-//		synchronized (this) {
-		sheet = sheets.get(sheetId);
+		Spreadsheet sheet = sheets.get(sheetId);
 		if (sheet == null) {
 			throw new WebApplicationException(Status.NOT_FOUND); // 404
 		}
@@ -439,10 +343,9 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 				|| (!sheet.getSharedWith().contains(String.format("%s@%s", userId, userDomain))))) {
 			throw new WebApplicationException(Status.FORBIDDEN); // 403
 		}
-//		}
 
 		CellRange cellRange = new CellRange(range);
-		rangeValues = cellRange.extractRangeValuesFrom(sheet.getRawValues());
+		String[][] rangeValues = cellRange.extractRangeValuesFrom(sheet.getRawValues());
 
 		String[][] values = SpreadsheetEngineImpl.getInstance().computeSpreadsheetValues(new AbstractSpreadsheet() {
 			@Override
@@ -471,81 +374,7 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 
 			@Override
 			public String[][] getRangeValues(String sheetURL, String range) {
-				short retries = 0;
-
-				if (sheetURL.contains("rest")) {
-					WebTarget target = client.target(sheetURL).path("/range");
-					while (retries < MAX_RETRIES) {
-
-						try {
-							Response r = target.queryParam("userId", sheet.getOwner()).queryParam("userDomain", domain)
-									.queryParam("range", range).queryParam("serverSecret", SpreadsheetsResource.serverSecret).request().accept(MediaType.APPLICATION_JSON).get();
-
-							String[][] values;
-							if (r.getStatus() == Status.OK.getStatusCode() && r.hasEntity()) {
-								values = r.readEntity(String[][].class);
-								cellCache.put(String.format("%s@%s", sheetURL, range), values);
-								return values;
-							} else {
-								throw new WebApplicationException(r.getStatus());
-							}
-						} catch (ProcessingException pe) {
-							retries++;
-							try {
-								Thread.sleep(RETRY_PERIOD);
-							} catch (InterruptedException e) {
-							}
-						}
-					}
-				} else {
-
-					SoapSpreadsheets sheets = null;
-
-					String[] aux = sheetURL.split("/spreadsheets/");
-					String serverUrl = aux[0];
-					String sheetId = aux[1];
-
-					boolean success = false;
-
-					while (!success && retries < MAX_RETRIES) {
-						try {
-							QName QNAME = new QName(SoapSpreadsheets.NAMESPACE, SoapSpreadsheets.NAME);
-							Service service = Service.create(new URL(serverUrl + SpreadsheetsWS.SHEETS_WSDL), QNAME);
-							sheets = service.getPort(tp1.api.service.soap.SoapSpreadsheets.class);
-							success = true;
-						} catch (WebServiceException e) {
-							retries++;
-						} catch (MalformedURLException e) {
-						}
-					}
-
-					((BindingProvider) sheets).getRequestContext().put(BindingProviderProperties.CONNECT_TIMEOUT,
-							CONNECTION_TIMEOUT);
-					((BindingProvider) sheets).getRequestContext().put(BindingProviderProperties.REQUEST_TIMEOUT,
-							REPLY_TIMEOUT);
-
-					retries = 0;
-					success = false;
-
-					String[][] values;
-					while (!success && retries < MAX_RETRIES) {
-
-						try {
-							values = sheets.getRange(sheetId, sheet.getOwner(), domain, range, SpreadsheetsResource.serverSecret);
-							success = true;
-							cellCache.put(String.format("%s@%s", sheetURL, range), values);
-						} catch (WebServiceException wse) {
-							retries++;
-							try {
-								Thread.sleep(RETRY_PERIOD);
-							} catch (InterruptedException e) {
-							}
-						} catch (SheetsException e) {
-							throw new WebApplicationException(Status.BAD_REQUEST); // 400
-						}
-					}
-				}
-				return cellCache.get(String.format("%s@%s", sheetURL, range));
+				return importRangeValues(sheetURL, range, sheet.getOwner());
 			}
 		});
 
@@ -723,6 +552,110 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 			}
 		}
 		return 0;
+	}
+
+	private String[][] importRangeValues(String sheetURL, String range, String owner) {
+		short retries = 0;
+
+		if(sheetURL.contains(GOOGLE_SHEETS)) {
+			String sheetID = sheetURL.split(GOOGLE_SHEETS + "/")[1];
+			WebTarget target = client.target(GOOGLE_SHEETS).path("v4/spreadsheets");
+			while (retries < MAX_RETRIES) {
+
+				try {
+					Response r = target.path(sheetID).path("values").path(range).queryParam("key", googleKey)
+							.request().accept(MediaType.APPLICATION_JSON).get();
+
+					if (r.getStatus() == Status.OK.getStatusCode() && r.hasEntity()) {
+						String[][] values = r.readEntity(GoogleSheetValuesReturn.class).getValues();
+						cellCache.put(String.format("%s@%s", sheetURL, range), values);
+
+						return values;
+					} else {
+						System.err.println(googleKey);
+						throw new WebApplicationException(r.getStatus());
+					}
+
+				} catch (ProcessingException pe) {
+					retries++;
+					try {
+						Thread.sleep(RETRY_PERIOD);
+					} catch (InterruptedException e) {
+					}
+				}
+			}
+			
+			
+		} else if (sheetURL.contains("rest")) {
+			WebTarget target = client.target(sheetURL).path("/range");
+			while (retries < MAX_RETRIES) {
+
+				try {
+					Response r = target.queryParam("userId", owner).queryParam("userDomain", domain)
+							.queryParam("range", range).queryParam("serverSecret", serverSecret).request().accept(MediaType.APPLICATION_JSON).get();
+
+					if (r.getStatus() == Status.OK.getStatusCode() && r.hasEntity()) {
+						String[][] values = r.readEntity(String[][].class);
+						cellCache.put(String.format("%s@%s", sheetURL, range), values);
+						return values;
+					} else {
+						throw new WebApplicationException(r.getStatus());
+					}
+				} catch (ProcessingException pe) {
+					retries++;
+					try {
+						Thread.sleep(RETRY_PERIOD);
+					} catch (InterruptedException e) {
+					}
+				}
+			}
+		} else {
+
+			SoapSpreadsheets sheets = null;
+
+			String[] aux = sheetURL.split("/spreadsheets/");
+			String serverUrl = aux[0];
+			String sheetId = aux[1];
+
+			boolean success = false;
+
+			while (!success && retries < MAX_RETRIES) {
+				try {
+					QName QNAME = new QName(SoapSpreadsheets.NAMESPACE, SoapSpreadsheets.NAME);
+					Service service = Service.create(new URL(serverUrl + SpreadsheetsWS.SHEETS_WSDL), QNAME);
+					sheets = service.getPort(tp1.api.service.soap.SoapSpreadsheets.class);
+					success = true;
+				} catch (WebServiceException e) {
+					retries++;
+				} catch (MalformedURLException e) {
+				}
+			}
+
+			((BindingProvider) sheets).getRequestContext().put(BindingProviderProperties.CONNECT_TIMEOUT,
+					CONNECTION_TIMEOUT);
+			((BindingProvider) sheets).getRequestContext().put(BindingProviderProperties.REQUEST_TIMEOUT,
+					REPLY_TIMEOUT);
+
+			retries = 0;
+
+			while (retries < MAX_RETRIES) {
+
+				try {
+					String[][] values = sheets.getRange(sheetId, owner, domain, range, serverSecret);
+					cellCache.put(String.format("%s@%s", sheetURL, range), values);
+					return values;
+				} catch (WebServiceException wse) {
+					retries++;
+					try {
+						Thread.sleep(RETRY_PERIOD);
+					} catch (InterruptedException e) {
+					}
+				} catch (SheetsException e) {
+					throw new WebApplicationException(Status.BAD_REQUEST); // 400
+				}
+			}
+		}
+		return cellCache.get(String.format("%s@%s", sheetURL, range));
 	}
 
 }

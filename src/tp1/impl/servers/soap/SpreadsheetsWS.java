@@ -33,6 +33,7 @@ import jakarta.xml.ws.Service;
 import jakarta.xml.ws.WebServiceException;
 import tp1.api.Spreadsheet;
 import tp1.api.engine.AbstractSpreadsheet;
+import tp1.api.replies.GoogleSheetValuesReturn;
 import tp1.api.service.rest.RestUsers;
 import tp1.api.service.soap.SheetsException;
 import tp1.api.service.soap.SoapSpreadsheets;
@@ -42,48 +43,48 @@ import tp1.discovery.Discovery;
 import tp1.impl.engine.SpreadsheetEngineImpl;
 import tp1.util.CellRange;
 
-@WebService(serviceName = SoapSpreadsheets.NAME,
-targetNamespace = SoapSpreadsheets.NAMESPACE,
-endpointInterface = SoapSpreadsheets.INTERFACE)
+@WebService(serviceName = SoapSpreadsheets.NAME, targetNamespace = SoapSpreadsheets.NAMESPACE, endpointInterface = SoapSpreadsheets.INTERFACE)
 
 @Singleton
 public class SpreadsheetsWS implements SoapSpreadsheets {
-	
-public final static String SHEETS_WSDL = "/spreadsheets/?wsdl";
-	
+
+	public final static String SHEETS_WSDL = "/spreadsheets/?wsdl";
+
 	public static final int PORT = 8080;
 	public static final int MAX_RETRIES = 3;
 	public static final long RETRY_PERIOD = 1000;
 	public static final int CONNECTION_TIMEOUT = 10000;
 	public static final int REPLY_TIMEOUT = 600;
-	
+	public static final String GOOGLE_SHEETS = "https://sheets.googleapis.com";
+
 	private final Map<String, Spreadsheet> sheets = new HashMap<String, Spreadsheet>();
 	private final Map<String, Set<String>> userSheets = new HashMap<String, Set<String>>();
 	private final Map<String, String[][]> cellCache = new HashMap<String, String[][]>();
 	private static Discovery discovery;
-	private static String domain, serverSecret;
+	private static String domain, serverSecret, googleKey;
 	private static Client client;
 
 	public SpreadsheetsWS() {
 	}
 
-	public SpreadsheetsWS(String domain, String serverSecret, Discovery discovery) {
+	public SpreadsheetsWS(String domain, String serverSecret, String googleKey, Discovery discovery) {
 		SpreadsheetsWS.discovery = discovery;
 		SpreadsheetsWS.domain = domain;
 		SpreadsheetsWS.serverSecret = serverSecret;
-		
+		SpreadsheetsWS.googleKey = googleKey;
+
 		ClientConfig config = new ClientConfig();
 		config.property(ClientProperties.CONNECT_TIMEOUT, CONNECTION_TIMEOUT);
 		config.property(ClientProperties.READ_TIMEOUT, REPLY_TIMEOUT);
 		client = ClientBuilder.newClient(config);
 	}
-	
+
 	@Override
 	public String createSpreadsheet(Spreadsheet sheet, String password) throws SheetsException {
 
 		if (sheet == null || password == null || sheet.getSheetId() != null || sheet.getSheetURL() != null
 				|| sheet.getRows() < 0 || sheet.getColumns() < 0) {
-			throw new SheetsException(); 
+			throw new SheetsException();
 		}
 
 		requestUser(domain, sheet.getOwner(), password);
@@ -117,13 +118,13 @@ public final static String SHEETS_WSDL = "/spreadsheets/?wsdl";
 	public void deleteSpreadsheet(String sheetId, String password) throws SheetsException {
 
 		if (sheetId == null || password == null) {
-			throw new SheetsException(); 
+			throw new SheetsException();
 		}
 		String owner;
 		synchronized (this) {
 			Spreadsheet sheet = sheets.get(sheetId);
 			if (sheet == null) {
-				throw new SheetsException(); 
+				throw new SheetsException();
 			}
 			owner = sheet.getOwner();
 		}
@@ -133,7 +134,7 @@ public final static String SHEETS_WSDL = "/spreadsheets/?wsdl";
 		synchronized (this) {
 			Spreadsheet sheet = sheets.get(sheetId);
 			if (sheet == null) {
-				throw new SheetsException(); 
+				throw new SheetsException();
 			}
 			if (sheet.getOwner().equals(owner)) {
 				sheets.remove(sheetId);
@@ -146,28 +147,26 @@ public final static String SHEETS_WSDL = "/spreadsheets/?wsdl";
 	public Spreadsheet getSpreadsheet(String sheetId, String userId, String password) throws SheetsException {
 
 		if (sheetId == null || userId == null) {
-			throw new SheetsException(); 
+			throw new SheetsException();
 		}
 
 		requestUser(domain, userId, password);
-		
-		Spreadsheet sheet;
-//		synchronized (this) {
-			sheet = sheets.get(sheetId);
-			if (sheet == null) {
-				throw new SheetsException();
-			}
 
-			if(!sheet.getOwner().equals(userId)  && ((sheet.getSharedWith() == null) || (!sheet.getSharedWith().contains(String.format("%s@%s", userId, domain))))){
-				throw new SheetsException(); 
-			}
-//		}
+		Spreadsheet sheet = sheets.get(sheetId);
+		if (sheet == null) {
+			throw new SheetsException();
+		}
+
+		if (!sheet.getOwner().equals(userId) && ((sheet.getSharedWith() == null)
+				|| (!sheet.getSharedWith().contains(String.format("%s@%s", userId, domain))))) {
+			throw new SheetsException();
+		}
 		return sheet;
 	}
 
 	@Override
 	public void shareSpreadsheet(String sheetId, String userId, String password) throws SheetsException {
-		
+
 		if (sheetId == null || userId == null || password == null) {
 			throw new SheetsException();
 		}
@@ -175,22 +174,15 @@ public final static String SHEETS_WSDL = "/spreadsheets/?wsdl";
 		String[] user = userId.split("@");
 		userExists(user[1], user[0]);
 
-		String owner;
-//		synchronized (this) {
-			Spreadsheet sheet = sheets.get(sheetId);
-			if (sheet == null) {
-				throw new SheetsException();
-			}
-			owner = sheet.getOwner();
-//		}
+		Spreadsheet sheet = sheets.get(sheetId);
+		if (sheet == null) {
+			throw new SheetsException();
+		}
+		String owner = sheet.getOwner();
 
 		requestUser(domain, owner, password);
 
 		synchronized (this) {
-/*			Spreadsheet sheet = sheets.get(sheetId);
-			if (sheet == null) {
-				throw new SheetsException(); 
-			}*/
 			boolean firstShare = false;
 			Set<String> sharedWith = sheet.getSharedWith();
 			if (sharedWith == null) {
@@ -204,7 +196,6 @@ public final static String SHEETS_WSDL = "/spreadsheets/?wsdl";
 			if (firstShare) {
 				sheet.setSharedWith(sharedWith);
 			}
-
 		}
 	}
 
@@ -212,31 +203,23 @@ public final static String SHEETS_WSDL = "/spreadsheets/?wsdl";
 	public void unshareSpreadsheet(String sheetId, String userId, String password) throws SheetsException {
 
 		if (sheetId == null || userId == null || password == null) {
-			throw new SheetsException(); 
+			throw new SheetsException();
 		}
 
 		String[] user = userId.split("@");
 		userExists(user[1], user[0]);
 
-//		String owner;
-//		synchronized (this) {
-			Spreadsheet sheet = sheets.get(sheetId);
-			if (sheet == null) {
-				throw new SheetsException(); 
-			}
-			String owner = sheet.getOwner();
-//		}
+		Spreadsheet sheet = sheets.get(sheetId);
+		if (sheet == null) {
+			throw new SheetsException();
+		}
+		String owner = sheet.getOwner();
 
 		requestUser(domain, owner, password);
 
-
 		synchronized (this) {
-/*			Spreadsheet sheet = sheets.get(sheetId);
-			if (sheet == null) {
-				throw new SheetsException(); 
-			}*/
 			Set<String> sharedWith = sheet.getSharedWith();
-			if(sharedWith != null) {
+			if (sharedWith != null) {
 				sharedWith.remove(userId);
 			}
 		}
@@ -258,8 +241,9 @@ public final static String SHEETS_WSDL = "/spreadsheets/?wsdl";
 				throw new SheetsException();
 			}
 
-			if(!sheet.getOwner().equals(userId)  && ((sheet.getSharedWith() == null) || (!sheet.getSharedWith().contains(String.format("%s@%s", userId, domain))))){
-				throw new SheetsException(); 
+			if (!sheet.getOwner().equals(userId) && ((sheet.getSharedWith() == null)
+					|| (!sheet.getSharedWith().contains(String.format("%s@%s", userId, domain))))) {
+				throw new SheetsException();
 			}
 
 			sheet.setCellRawValue(cell, rawValue);
@@ -270,25 +254,22 @@ public final static String SHEETS_WSDL = "/spreadsheets/?wsdl";
 	public String[][] getSpreadsheetValues(String sheetId, String userId, String password) throws SheetsException {
 
 		if (sheetId == null || userId == null) {
-			throw new SheetsException(); 
+			throw new SheetsException();
 		}
 
 		requestUser(domain, userId, password);
 
-		String[][] values;
-		Spreadsheet sheet;
-//		synchronized (this) {
-			sheet = sheets.get(sheetId);
-			if (sheet == null) {
-				throw new SheetsException(); 
-			}
+		Spreadsheet sheet = sheets.get(sheetId);
+		if (sheet == null) {
+			throw new SheetsException();
+		}
 
-			if(!sheet.getOwner().equals(userId)  && ((sheet.getSharedWith() == null) || (!sheet.getSharedWith().contains(String.format("%s@%s", userId, domain))))){
-				throw new SheetsException(); 
-			}
-//		}
-		
-		values = SpreadsheetEngineImpl.getInstance().computeSpreadsheetValues(new AbstractSpreadsheet() {
+		if (!sheet.getOwner().equals(userId) && ((sheet.getSharedWith() == null)
+				|| (!sheet.getSharedWith().contains(String.format("%s@%s", userId, domain))))) {
+			throw new SheetsException();
+		}
+
+		String[][] values = SpreadsheetEngineImpl.getInstance().computeSpreadsheetValues(new AbstractSpreadsheet() {
 			@Override
 			public int rows() {
 				return sheet.getRows();
@@ -315,114 +296,41 @@ public final static String SHEETS_WSDL = "/spreadsheets/?wsdl";
 
 			@Override
 			public String[][] getRangeValues(String sheetURL, String range) {
-				short retries = 0;
-
-				if(sheetURL.contains("rest")) {
-					WebTarget target = client.target(sheetURL).path("/range");
-					while (retries < MAX_RETRIES) {
-
-						try {
-							Response r = target.queryParam("userId", sheet.getOwner()).queryParam("userDomain", domain).queryParam("range", range).queryParam("serverSecret", serverSecret).request()
-									.accept(MediaType.APPLICATION_JSON).get();
-							
-							String[][] values;
-							if (r.getStatus() == Status.OK.getStatusCode() && r.hasEntity()) {
-								values = r.readEntity(String[][].class);
-								cellCache.put(String.format("%s@%s", sheetURL, range), values);
-
-								return values;
-							} else {
-								throw new RuntimeException();
-							}
-
-						} catch (ProcessingException pe) {
-							retries++;
-							try {
-								Thread.sleep(RETRY_PERIOD);
-							} catch (InterruptedException e) {
-							}
-						}
-					}
-				} else {
-
-					SoapSpreadsheets sheets = null;
-					
-					String[] aux = sheetURL.split("/spreadsheets/");
-					String serverUrl = aux[0];
-					String sheetId = aux[1];
-					
-					boolean success = false;
-					
-					while(!success && retries < MAX_RETRIES) {
-						try {
-							QName QNAME = new QName(SoapSpreadsheets.NAMESPACE, SoapSpreadsheets.NAME);
-							Service service = Service.create( new URL(serverUrl + SpreadsheetsWS.SHEETS_WSDL), QNAME);
-							sheets = service.getPort( tp1.api.service.soap.SoapSpreadsheets.class);
-							success = true;
-						} catch (WebServiceException e) {
-							retries++;
-						} catch (MalformedURLException e) {
-						}
-					}
-					
-					((BindingProvider) sheets).getRequestContext().put(BindingProviderProperties.CONNECT_TIMEOUT, CONNECTION_TIMEOUT);
-					((BindingProvider) sheets).getRequestContext().put(BindingProviderProperties.REQUEST_TIMEOUT, REPLY_TIMEOUT);
-					
-					retries = 0; success = false;
-					
-					String[][] values;
-					while(!success && retries < MAX_RETRIES) {
-						
-						try{
-							values = sheets.getRange(sheetId, sheet.getOwner(), domain, range, serverSecret);
-							success = true;
-							cellCache.put(String.format("%s@%s", sheetURL, range), values);
-						} catch(WebServiceException wse) {
-							retries++;
-							try { 
-								Thread.sleep(RETRY_PERIOD);
-							} catch (InterruptedException e) {
-							}
-						} catch (SheetsException e) {
-							throw new RuntimeException();
-						}
-					}
-				}
-			return cellCache.get(String.format("%s@%s", sheetURL, range));
+				return importRangeValues(sheetURL, range, sheet.getOwner());
 			}
 		});
-		return values; 
+		return values;
 	}
 
 	@Override
-	public String[][] getRange(String sheetId, String userId, String userDomain, String range, String serverSecret) throws SheetsException {
-		
+	public String[][] getRange(String sheetId, String userId, String userDomain, String range, String serverSecret)
+			throws SheetsException {
+
 		if (!serverSecret.equals(SpreadsheetsWS.serverSecret)) {
 			throw new SheetsException();
 		}
-		
+
 		if (sheetId == null || userId == null) {
-			throw new SheetsException(); 
+			throw new SheetsException();
 		}
 
 		String[][] rangeValues;
 		Spreadsheet sheet;
 		String user = String.format("%s@%s", userId, userDomain);
-		
-//		synchronized (this) {
-			sheet = sheets.get(sheetId);
-			if (sheet == null) {
-				throw new SheetsException(); 
-			}
 
-			if(!sheet.getOwner().equals(userId)  && ((sheet.getSharedWith() == null) || (!sheet.getSharedWith().contains(user)))){
-				throw new SheetsException(); 
-			}
-//		}
+		sheet = sheets.get(sheetId);
+		if (sheet == null) {
+			throw new SheetsException();
+		}
+
+		if (!sheet.getOwner().equals(userId)
+				&& ((sheet.getSharedWith() == null) || (!sheet.getSharedWith().contains(user)))) {
+			throw new SheetsException();
+		}
 
 		CellRange cellRange = new CellRange(range);
 		rangeValues = cellRange.extractRangeValuesFrom(sheet.getRawValues());
-		
+
 		String[][] values = SpreadsheetEngineImpl.getInstance().computeSpreadsheetValues(new AbstractSpreadsheet() {
 			@Override
 			public int rows() {
@@ -450,84 +358,10 @@ public final static String SHEETS_WSDL = "/spreadsheets/?wsdl";
 
 			@Override
 			public String[][] getRangeValues(String sheetURL, String range) {
-				short retries = 0;
-
-				if(sheetURL.contains("rest")) {
-					WebTarget target = client.target(sheetURL).path("/range");
-					while (retries < MAX_RETRIES) {
-
-						try {
-							Response r = target.queryParam("userId", sheet.getOwner()).queryParam("userDomain", domain).queryParam("range", range)
-									.queryParam("serverSecret", SpreadsheetsWS.serverSecret).request()
-									.accept(MediaType.APPLICATION_JSON).get();
-							
-							String[][] values;
-							if (r.getStatus() == Status.OK.getStatusCode() && r.hasEntity()) {
-								values = r.readEntity(String[][].class);
-								cellCache.put(String.format("%s@%s", sheetURL, range), values);
-
-								return values;
-							} else {
-								throw new RuntimeException();
-							}
-
-						} catch (ProcessingException pe) {
-							retries++;
-							try {
-								Thread.sleep(RETRY_PERIOD);
-							} catch (InterruptedException e) {
-							}
-						}
-					}
-				} else {
-
-					SoapSpreadsheets sheets = null;
-					
-					String[] aux = sheetURL.split("/spreadsheets/");
-					String serverUrl = aux[0];
-					String sheetId = aux[1];
-					
-					boolean success = false;
-					
-					while(!success && retries < MAX_RETRIES) {
-						try {
-							QName QNAME = new QName(SoapSpreadsheets.NAMESPACE, SoapSpreadsheets.NAME);
-							Service service = Service.create( new URL(serverUrl + SHEETS_WSDL), QNAME);
-							sheets = service.getPort( tp1.api.service.soap.SoapSpreadsheets.class);
-							success = true;
-						} catch (WebServiceException e) {
-							retries++;
-						} catch (MalformedURLException e) {
-						}
-					}
-					
-					((BindingProvider) sheets).getRequestContext().put(BindingProviderProperties.CONNECT_TIMEOUT, CONNECTION_TIMEOUT);
-					((BindingProvider) sheets).getRequestContext().put(BindingProviderProperties.REQUEST_TIMEOUT, REPLY_TIMEOUT);
-					
-					retries = 0; success = false;
-					
-					String[][] values;
-					while(!success && retries < MAX_RETRIES) {
-						
-						try{
-							values = sheets.getRange(sheetId, sheet.getOwner(), domain, range, SpreadsheetsWS.serverSecret);
-							success = true;
-							cellCache.put(String.format("%s@%s", sheetURL, range), values);
-						} catch(WebServiceException wse) {
-							retries++;
-							try { 
-								Thread.sleep(RETRY_PERIOD);
-							} catch (InterruptedException e) {
-							}
-						} catch (SheetsException e) {
-							throw new RuntimeException();
-						}
-					}
-				}
-			return cellCache.get(String.format("%s@%s", sheetURL, range));
+				return importRangeValues(sheetURL, range, sheet.getOwner());
 			}
 		});
-		return values; 
+		return values;
 	}
 
 	@Override
@@ -535,9 +369,9 @@ public final static String SHEETS_WSDL = "/spreadsheets/?wsdl";
 		if (!serverSecret.equals(SpreadsheetsWS.serverSecret)) {
 			throw new SheetsException();
 		}
-		
+
 		if (userId == null) {
-			throw new SheetsException(); 
+			throw new SheetsException();
 		}
 		synchronized (this) {
 			Set<String> sheetIds = userSheets.get(userId);
@@ -549,13 +383,13 @@ public final static String SHEETS_WSDL = "/spreadsheets/?wsdl";
 			}
 		}
 	}
-	
+
 	private void requestUser(String userDomain, String userId, String password) throws SheetsException {
 		URI[] uri = null;
 		while (uri == null) {
 			try {
 				uri = discovery.knownUrisOf(userDomain, "users");
-				if(uri == null) {
+				if (uri == null) {
 					Thread.sleep(500);
 				}
 			} catch (Exception e) {
@@ -565,8 +399,8 @@ public final static String SHEETS_WSDL = "/spreadsheets/?wsdl";
 		String serverUrl = uri[0].toString();
 		short retries = 0;
 		boolean success = false;
-		
-		if(serverUrl.contains("rest")) {
+
+		if (serverUrl.contains("rest")) {
 			WebTarget target = client.target(serverUrl).path(RestUsers.PATH);
 
 			while (!success && retries < MAX_RETRIES) {
@@ -575,7 +409,7 @@ public final static String SHEETS_WSDL = "/spreadsheets/?wsdl";
 					Response r = target.path(userId).queryParam("password", password).request()
 							.accept(MediaType.APPLICATION_JSON).get();
 
-					if(r.getStatus() != Status.OK.getStatusCode() ) {
+					if (r.getStatus() != Status.OK.getStatusCode()) {
 						throw new SheetsException();
 					}
 					success = true;
@@ -590,48 +424,50 @@ public final static String SHEETS_WSDL = "/spreadsheets/?wsdl";
 			}
 		} else {
 			SoapUsers users = null;
-			
-			while(!success && retries < MAX_RETRIES) {
+
+			while (!success && retries < MAX_RETRIES) {
 				try {
 					QName QNAME = new QName(SoapUsers.NAMESPACE, SoapUsers.NAME);
-					Service service = Service.create( new URL(serverUrl + UsersWS.USERS_WSDL), QNAME);
-					users = service.getPort( tp1.api.service.soap.SoapUsers.class);
+					Service service = Service.create(new URL(serverUrl + UsersWS.USERS_WSDL), QNAME);
+					users = service.getPort(tp1.api.service.soap.SoapUsers.class);
 					success = true;
 				} catch (WebServiceException e) {
 					retries++;
 				} catch (MalformedURLException e) {
 				}
 			}
-			
-			((BindingProvider) users).getRequestContext().put(BindingProviderProperties.CONNECT_TIMEOUT, CONNECTION_TIMEOUT);
+
+			((BindingProvider) users).getRequestContext().put(BindingProviderProperties.CONNECT_TIMEOUT,
+					CONNECTION_TIMEOUT);
 			((BindingProvider) users).getRequestContext().put(BindingProviderProperties.REQUEST_TIMEOUT, REPLY_TIMEOUT);
-			
-			retries = 0; success = false;
-			
-			while(!success && retries < MAX_RETRIES) {
-				
-				try{
+
+			retries = 0;
+			success = false;
+
+			while (!success && retries < MAX_RETRIES) {
+
+				try {
 					users.getUser(userId, password);
 					success = true;
-				} catch(WebServiceException wse) {
+				} catch (WebServiceException wse) {
 					retries++;
 					try {
 						Thread.sleep(RETRY_PERIOD);
 					} catch (InterruptedException e) {
 					}
-				} catch(UsersException ue) {
+				} catch (UsersException ue) {
 					throw new SheetsException();
 				}
 			}
 		}
 	}
-	
+
 	private void userExists(String userDomain, String userId) throws SheetsException {
 		URI[] uri = null;
 		while (uri == null) {
 			try {
 				uri = discovery.knownUrisOf(userDomain, "users");
-				if(uri == null) {
+				if (uri == null) {
 					Thread.sleep(500);
 				}
 			} catch (Exception e) {
@@ -641,8 +477,8 @@ public final static String SHEETS_WSDL = "/spreadsheets/?wsdl";
 		String serverUrl = uri[0].toString();
 		short retries = 0;
 		boolean success = false;
-		
-		if(serverUrl.contains("rest")) {
+
+		if (serverUrl.contains("rest")) {
 			WebTarget target = client.target(serverUrl).path(RestUsers.PATH);
 
 			while (!success && retries < MAX_RETRIES) {
@@ -650,54 +486,160 @@ public final static String SHEETS_WSDL = "/spreadsheets/?wsdl";
 					Response r = target.path("exists").path(userId).queryParam("serverSecret", serverSecret).request()
 							.accept(MediaType.APPLICATION_JSON).get();
 
-					if(r.getStatus() != Status.OK.getStatusCode()){
+					if (r.getStatus() != Status.OK.getStatusCode()) {
 						throw new SheetsException();
 					}
 					success = true;
 
 				} catch (ProcessingException pe) {
 					retries++;
-				try {
-					Thread.sleep(RETRY_PERIOD);
-				} catch (InterruptedException e) {
+					try {
+						Thread.sleep(RETRY_PERIOD);
+					} catch (InterruptedException e) {
+					}
 				}
 			}
-		}
 		} else {
 			SoapUsers users = null;
-			
-			while(!success && retries < MAX_RETRIES) {
+
+			while (!success && retries < MAX_RETRIES) {
 				try {
 					QName QNAME = new QName(SoapUsers.NAMESPACE, SoapUsers.NAME);
-					Service service = Service.create( new URL(serverUrl + UsersWS.USERS_WSDL), QNAME);
-					users = service.getPort( tp1.api.service.soap.SoapUsers.class);
+					Service service = Service.create(new URL(serverUrl + UsersWS.USERS_WSDL), QNAME);
+					users = service.getPort(tp1.api.service.soap.SoapUsers.class);
 					success = true;
 				} catch (WebServiceException e) {
 					retries++;
 				} catch (MalformedURLException e) {
 				}
 			}
-			
-			((BindingProvider) users).getRequestContext().put(BindingProviderProperties.CONNECT_TIMEOUT, CONNECTION_TIMEOUT);
+
+			((BindingProvider) users).getRequestContext().put(BindingProviderProperties.CONNECT_TIMEOUT,
+					CONNECTION_TIMEOUT);
 			((BindingProvider) users).getRequestContext().put(BindingProviderProperties.REQUEST_TIMEOUT, REPLY_TIMEOUT);
-			
-			retries = 0; success = false;
-			
-			while(!success && retries < MAX_RETRIES) {
-				try{
+
+			retries = 0;
+			success = false;
+
+			while (!success && retries < MAX_RETRIES) {
+				try {
 					users.userExists(userId, serverSecret);
 					success = true;
-				} catch(WebServiceException wse) {
+				} catch (WebServiceException wse) {
 					retries++;
 					try {
 						Thread.sleep(RETRY_PERIOD);
 					} catch (InterruptedException e) {
 					}
-				} catch(UsersException ue) {
+				} catch (UsersException ue) {
 					throw new SheetsException();
 				}
 			}
 		}
+	}
+	
+	private String[][] importRangeValues(String sheetURL, String range, String owner) {
+		short retries = 0;
+
+		if(sheetURL.contains(GOOGLE_SHEETS)) {
+			String sheetID = sheetURL.split(GOOGLE_SHEETS + "/")[1];
+			WebTarget target = client.target(GOOGLE_SHEETS).path("v4/spreadsheets");
+			while (retries < MAX_RETRIES) {
+
+				try {
+					Response r = target.path(sheetID).path("values").path(range).queryParam("key", googleKey)
+							.request().accept(MediaType.APPLICATION_JSON).get();
+
+					if (r.getStatus() == Status.OK.getStatusCode() && r.hasEntity()) {
+						String[][] values = r.readEntity(GoogleSheetValuesReturn.class).getValues();
+						cellCache.put(String.format("%s@%s", sheetURL, range), values);
+
+						return values;
+					} else {
+						System.err.println(googleKey);
+						throw new WebApplicationException(r.getStatus());
+					}
+
+				} catch (ProcessingException pe) {
+					retries++;
+					try {
+						Thread.sleep(RETRY_PERIOD);
+					} catch (InterruptedException e) {
+					}
+				}
+			}
+			
+			
+		} else if (sheetURL.contains("rest")) {
+			WebTarget target = client.target(sheetURL).path("/range");
+			while (retries < MAX_RETRIES) {
+
+				try {
+					Response r = target.queryParam("userId", owner).queryParam("userDomain", domain)
+							.queryParam("range", range).queryParam("serverSecret", serverSecret).request().accept(MediaType.APPLICATION_JSON).get();
+
+					if (r.getStatus() == Status.OK.getStatusCode() && r.hasEntity()) {
+						String[][] values = r.readEntity(String[][].class);
+						cellCache.put(String.format("%s@%s", sheetURL, range), values);
+						return values;
+					} else {
+						throw new WebApplicationException(r.getStatus());
+					}
+				} catch (ProcessingException pe) {
+					retries++;
+					try {
+						Thread.sleep(RETRY_PERIOD);
+					} catch (InterruptedException e) {
+					}
+				}
+			}
+		} else {
+
+			SoapSpreadsheets sheets = null;
+
+			String[] aux = sheetURL.split("/spreadsheets/");
+			String serverUrl = aux[0];
+			String sheetId = aux[1];
+
+			boolean success = false;
+
+			while (!success && retries < MAX_RETRIES) {
+				try {
+					QName QNAME = new QName(SoapSpreadsheets.NAMESPACE, SoapSpreadsheets.NAME);
+					Service service = Service.create(new URL(serverUrl + SpreadsheetsWS.SHEETS_WSDL), QNAME);
+					sheets = service.getPort(tp1.api.service.soap.SoapSpreadsheets.class);
+					success = true;
+				} catch (WebServiceException e) {
+					retries++;
+				} catch (MalformedURLException e) {
+				}
+			}
+
+			((BindingProvider) sheets).getRequestContext().put(BindingProviderProperties.CONNECT_TIMEOUT,
+					CONNECTION_TIMEOUT);
+			((BindingProvider) sheets).getRequestContext().put(BindingProviderProperties.REQUEST_TIMEOUT,
+					REPLY_TIMEOUT);
+
+			retries = 0;
+
+			while (retries < MAX_RETRIES) {
+
+				try {
+					String[][] values = sheets.getRange(sheetId, owner, domain, range, serverSecret);
+					cellCache.put(String.format("%s@%s", sheetURL, range), values);
+					return values;
+				} catch (WebServiceException wse) {
+					retries++;
+					try {
+						Thread.sleep(RETRY_PERIOD);
+					} catch (InterruptedException e) {
+					}
+				} catch (SheetsException e) {
+					throw new WebApplicationException(Status.BAD_REQUEST); // 400
+				}
+			}
+		}
+		return cellCache.get(String.format("%s@%s", sheetURL, range));
 	}
 
 }

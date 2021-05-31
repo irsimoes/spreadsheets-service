@@ -89,9 +89,7 @@ public class UsersWS implements SoapUsers {
 	@Override
 	public User getUser(String userId, String password) throws UsersException {
 
-		User user;
-//		synchronized (users) {
-			user = users.get(userId);
+		User user = users.get(userId);
 
 			if (user == null) {
 				throw new UsersException();
@@ -100,7 +98,6 @@ public class UsersWS implements SoapUsers {
 			if (!user.getPassword().equals(password)) {
 				throw new UsersException();
 			}
-//		}
 		return user;
 	}
 
@@ -240,13 +237,12 @@ public class UsersWS implements SoapUsers {
 		if(!serverSecret.equals(UsersWS.serverSecret)) {
 			throw new UsersException();
 		}
-//		synchronized (users) {
-			User user = users.get(userId);
 
-			if (user == null) {
-				throw new UsersException();
-			}
-//		}
+		User user = users.get(userId);
+
+		if (user == null) {
+			throw new UsersException();
+		}
 		return true;
 	}
 
