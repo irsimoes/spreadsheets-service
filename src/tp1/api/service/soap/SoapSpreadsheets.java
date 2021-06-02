@@ -2,6 +2,7 @@ package tp1.api.service.soap;
 
 import jakarta.jws.WebService;
 import tp1.api.Spreadsheet;
+import tp1.impl.servers.rest.ValuesResult;
 
 @WebService(serviceName=SoapSpreadsheets.NAME, targetNamespace=SoapSpreadsheets.NAMESPACE, endpointInterface=SoapSpreadsheets.INTERFACE)
 public interface SoapSpreadsheets {
@@ -100,7 +101,7 @@ public interface SoapSpreadsheets {
 	 * 
 	 * @throws SheetsException otherwise
 	 */
-	String[][] getRange(String sheetId, String userId, String domain, String range, String serverSecret) throws SheetsException;
+	ValuesResult getRange(String sheetId, String userId, String domain, String range, String serverSecret, long twClient) throws SheetsException;
 	
 	/**
 	 * Removes all the spreadsheets the deleted user had.

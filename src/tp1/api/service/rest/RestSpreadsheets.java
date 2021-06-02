@@ -11,6 +11,7 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import tp1.api.Spreadsheet;
+import tp1.impl.servers.rest.ValuesResult;
 
 
 @Path(RestSpreadsheets.PATH)
@@ -161,8 +162,9 @@ public interface RestSpreadsheets {
 	@GET
 	@Path("/{sheetId}/range")
 	@Produces(MediaType.APPLICATION_JSON)
-	String[][] getRange(@PathParam("sheetId") String sheetId, 
-			@QueryParam("userId") String userId, @QueryParam("userDomain") String userDomain, @QueryParam("range") String range, @QueryParam("serverSecret") String serverSecret);
+	ValuesResult getRange(@PathParam("sheetId") String sheetId, 
+			@QueryParam("userId") String userId, @QueryParam("userDomain") String userDomain, @QueryParam("range") String range, 
+			@QueryParam("serverSecret") String serverSecret, @QueryParam("twClient") long twClient);
 	
 	/**
 	 * Removes all the spreadsheets the deleted user had.
