@@ -15,20 +15,9 @@ public class ReplicationManager {
 		return version;
 	}
 	
-	public void addOperation(Operation op) {
-		System.out.println("versao antes de atualizar: " + version);
-		synchronized(this) {
+	public synchronized void addOperation(Operation op) {
 			version++;
-			System.out.println("versao atualizada: " + version);
-			try{
-				operationLog.put(op.getVersion(), op);
-			} catch(Exception e) {
-				System.out.println(e.getMessage());
-				e.printStackTrace();
-				throw e;
-			}
-			System.out.println("added");
-		}
+			operationLog.put(op.getVersion(), op);
 	}
 
 	public Operation[] getOperations(int first, int nOps) {

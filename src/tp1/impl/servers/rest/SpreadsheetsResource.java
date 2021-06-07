@@ -16,7 +16,6 @@ import org.glassfish.jersey.client.ClientProperties;
 import com.google.gson.Gson;
 import com.sun.xml.ws.client.BindingProviderProperties;
 
-import jakarta.inject.Singleton;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.client.*;
@@ -41,7 +40,6 @@ import tp1.impl.servers.soap.SpreadsheetsWS;
 import tp1.impl.servers.soap.UsersWS;
 import tp1.util.CellRange;
 
-@Singleton
 public class SpreadsheetsResource implements RestSpreadsheets {
 
 	public static final int PORT = 8080;
@@ -52,23 +50,23 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 	public static final int CACHE_VALIDITY_TIME = 20000;
 	public static final String GOOGLE_SHEETS = "https://sheets.googleapis.com";
 
-	private final Map<String, Spreadsheet> sheets = new HashMap<String, Spreadsheet>();
-	private final Map<String, Set<String>> userSheets = new HashMap<String, Set<String>>();
-	private final Map<String, ValuesResult> cache = new HashMap<String, ValuesResult>();
-	private final Map<String, Long> twServer = new HashMap<String, Long>();
-	private final Map<String, Long> tc = new HashMap<String, Long>();
-	private static Discovery discovery;
-	private static String domain, serverSecret, googleKey;
-	private static Client client;
+	private Map<String, Spreadsheet> sheets = new HashMap<String, Spreadsheet>();
+	private Map<String, Set<String>> userSheets = new HashMap<String, Set<String>>();
+	private Map<String, ValuesResult> cache = new HashMap<String, ValuesResult>();
+	private Map<String, Long> twServer = new HashMap<String, Long>();
+	private Map<String, Long> tc = new HashMap<String, Long>();
+	private Discovery discovery;
+	private String domain, serverSecret, googleKey;
+	private Client client;
 
 	public SpreadsheetsResource() {
 	}
 
 	public SpreadsheetsResource(String domain, String serverSecret, String googleKey, Discovery discovery) {
-		SpreadsheetsResource.discovery = discovery;
-		SpreadsheetsResource.domain = domain;
-		SpreadsheetsResource.serverSecret = serverSecret;
-		SpreadsheetsResource.googleKey = googleKey;
+		this.discovery = discovery;
+		this.domain = domain;
+		this.serverSecret = serverSecret;
+		this.googleKey = googleKey;
 
 		ClientConfig config = new ClientConfig();
 		config.property(ClientProperties.CONNECT_TIMEOUT, CONNECTION_TIMEOUT);
@@ -334,7 +332,7 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 	public ValuesResult getRange(int version, String sheetId, String userId, String userDomain, String range, String serverSecret,
 			long twClient) {
 
-		if (!serverSecret.equals(SpreadsheetsResource.serverSecret)) {
+		if (!serverSecret.equals(this.serverSecret)) {
 			throw new WebApplicationException(Status.FORBIDDEN);
 		}
 
@@ -396,7 +394,7 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 	@Override
 	public void deleteUserSpreadsheets(String userId, String serverSecret) {
 
-		if (!serverSecret.equals(SpreadsheetsResource.serverSecret)) {
+		if (!serverSecret.equals(this.serverSecret)) {
 			throw new WebApplicationException(Status.FORBIDDEN);
 		}
 
@@ -466,8 +464,7 @@ public class SpreadsheetsResource implements RestSpreadsheets {
 				}
 			}
 
-			((BindingProvider) users).getRequestContext().put(BindingProviderProperties.CONNECT_TIMEOUT,
-					CONNECTION_TIMEOUT);
+			((BindingProvider) users).getRequestContext().put(BindingProviderProperties.CONNECT_TIMEOUT, CONNECTION_TIMEOUT);
 			((BindingProvider) users).getRequestContext().put(BindingProviderProperties.REQUEST_TIMEOUT, REPLY_TIMEOUT);
 
 			retries = 0;

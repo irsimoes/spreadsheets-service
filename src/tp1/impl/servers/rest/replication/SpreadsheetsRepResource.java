@@ -103,7 +103,7 @@ public class SpreadsheetsRepResource implements RestRepSpreadsheets {
 
 		isPrimary = false;
 		monitorDomain();
-		if(!isPrimary) {
+		if (!isPrimary) {
 			getCurrentState();
 		}
 	}
@@ -112,9 +112,8 @@ public class SpreadsheetsRepResource implements RestRepSpreadsheets {
 	public String createSpreadsheet(Spreadsheet sheet, String password) {
 
 		if (!isPrimary) {
-			throw new WebApplicationException(Response.temporaryRedirect(
-					UriBuilder.fromUri(primaryURI).path(RestSpreadsheets.PATH).queryParam("password", password).build())
-					.build());
+			throw new WebApplicationException(Response.temporaryRedirect(UriBuilder.fromUri(primaryURI).path(RestSpreadsheets.PATH)
+					.queryParam("password", password).build()).build());
 		}
 
 		if (sheet == null || password == null || sheet.getSheetId() != null || sheet.getSheetURL() != null
@@ -138,35 +137,12 @@ public class SpreadsheetsRepResource implements RestRepSpreadsheets {
 		} catch (UnknownHostException e) {
 		}
 
-		// System.out.println("entrei no if");
 		String sheetJson = json.toJson(sheet);
 		String[] params = new String[] { sheetJson, password };
 		Operation operation = new Operation(repManager.getCurrentVersion() + 1, CREATE, params);
-		// System.out.println("pedido versao :" + (repManager.getCurrentVersion() + 1) + " sheetId: " + sheet.getSheetId());
 		handleRequest(operation);
-		synchronized (this) {
-			repManager.addOperation(operation);
-			return create(sheet, password);
-		}
-	}
-
-	private String create(Spreadsheet sheet, String password) {
-		synchronized (this) {
-			String id = sheet.getSheetId();
-			sheets.put(id, sheet);
-
-			Set<String> sheetsSet = userSheets.get(sheet.getOwner());
-			if (sheetsSet == null) {
-				sheetsSet = new HashSet<String>();
-			}
-
-			sheetsSet.add(id);
-			userSheets.put(sheet.getOwner(), sheetsSet);
-			twServer.put(id, System.currentTimeMillis());
-		}
-
-		//System.out.println(sheet.getSheetId() + "->" + json.toJson(sheet));
-		return sheet.getSheetId();
+		repManager.addOperation(operation);
+		return create(sheet, password);
 	}
 
 	@Override
@@ -175,9 +151,10 @@ public class SpreadsheetsRepResource implements RestRepSpreadsheets {
 			throw new WebApplicationException(Status.BAD_REQUEST); // 400
 		}
 
-		if(!isPrimary) {
-			throw new WebApplicationException(Response.temporaryRedirect(UriBuilder.fromUri(primaryURI)
-					.path(String.format("%s/%s", RestSpreadsheets.PATH, sheetId)).queryParam("password", password).build()).build());
+		if (!isPrimary) {
+			throw new WebApplicationException(Response.temporaryRedirect(
+					UriBuilder.fromUri(primaryURI).path(String.format("%s/%s", RestSpreadsheets.PATH, sheetId))
+							.queryParam("password", password).build()).build());
 		}
 
 		String owner;
@@ -201,38 +178,24 @@ public class SpreadsheetsRepResource implements RestRepSpreadsheets {
 		repManager.addOperation(operation);
 	}
 
-	private void delete(String sheetId, String password) {
-
-		synchronized (this) {
-			Spreadsheet sheet = sheets.get(sheetId);
-			if (sheet == null) {
-				throw new WebApplicationException(Status.NOT_FOUND); // 404
-			}
-			sheets.remove(sheetId);
-			userSheets.get(sheet.getOwner()).remove(sheetId);
-			twServer.remove(sheetId);
-		}
-	}
-
 	@Override
 	public Spreadsheet getSpreadsheet(int version, String sheetId, String userId, String password) {
 		if (!isPrimary) {
 			if (version > repManager.getCurrentVersion()) {
-				
+
 				boolean success = false;
 				int retries = 0;
 
 				while (!success && retries < MAX_RETRIES) {
 					success = askForUpdate(primaryURI, version);
 				}
-				
 
 				if (!success) {
 					throw new WebApplicationException(Response
-							.temporaryRedirect(
-									UriBuilder.fromUri(primaryURI).path(String.format("%s/%s",RestSpreadsheets.PATH ,sheetId))
-											.queryParam("userId", userId).queryParam("password", password).build())
-							.header(RestSpreadsheets.HEADER_VERSION, version).build());
+							.temporaryRedirect(UriBuilder.fromUri(primaryURI)
+									.path(String.format("%s/%s", RestSpreadsheets.PATH, sheetId))
+									.queryParam("userId", userId).queryParam("password", password).build())
+									.header(RestSpreadsheets.HEADER_VERSION, version).build());
 				}
 			}
 		}
@@ -261,26 +224,21 @@ public class SpreadsheetsRepResource implements RestRepSpreadsheets {
 
 	@Override
 	public String[][] getSpreadsheetValues(int version, String sheetId, String userId, String password) {
-		System.out.println("recebeu pedido " + sheetId);
 		if (!isPrimary) {
-			System.out.println("comparacao versoes " + version + " " + repManager.getCurrentVersion());
 			if (version > repManager.getCurrentVersion()) {
-				System.out.println("pediu update " + sheetId);
 				boolean success = false;
 				int retries = 0;
 
 				while (!success && retries < MAX_RETRIES) {
 					success = askForUpdate(primaryURI, version);
 				}
-				System.out.println("pedido update acabou " + sheetId + " " + repManager.getCurrentVersion());
 
 				if (!success) {
-					System.out.println("nao teve sucesso " + sheetId);
 					throw new WebApplicationException(Response
 							.temporaryRedirect(UriBuilder.fromUri(primaryURI)
-									.path(String.format("%s/%s/values",RestSpreadsheets.PATH ,sheetId)).queryParam("userId", userId)
-									.queryParam("password", password).build())
-							.header(RestSpreadsheets.HEADER_VERSION, version).build());
+									.path(String.format("%s/%s/values", RestSpreadsheets.PATH, sheetId))
+									.queryParam("userId", userId).queryParam("password", password).build())
+									.header(RestSpreadsheets.HEADER_VERSION, version).build());
 				}
 			}
 		}
@@ -340,11 +298,10 @@ public class SpreadsheetsRepResource implements RestRepSpreadsheets {
 	@Override
 	public void updateCell(String sheetId, String cell, String rawValue, String userId, String password) {
 
-		if(!isPrimary) {
+		if (!isPrimary) {
 			throw new WebApplicationException(Response.temporaryRedirect(
-					UriBuilder.fromUri(primaryURI).path(String.format("%s/%s/%s",RestSpreadsheets.PATH ,sheetId, cell))
-							.queryParam("userId", userId).queryParam("password", password).build())
-					.build());
+					UriBuilder.fromUri(primaryURI).path(String.format("%s/%s/%s", RestSpreadsheets.PATH, sheetId, cell))
+							  .queryParam("userId", userId).queryParam("password", password).build()).build());
 		}
 
 		if (sheetId == null || userId == null || password == null || rawValue == null) {
@@ -363,28 +320,13 @@ public class SpreadsheetsRepResource implements RestRepSpreadsheets {
 		repManager.addOperation(operation);
 	}
 
-	private void update(String sheetId, String cell, String rawValue, String userId, String password) {
-		Spreadsheet sheet = sheets.get(sheetId);
-		if (sheet == null) {
-			throw new WebApplicationException(Status.NOT_FOUND); // 404
-		}
-		if (!sheet.getOwner().equals(userId) && ((sheet.getSharedWith() == null)
-				|| (!sheet.getSharedWith().contains(String.format("%s@%s", userId, domain))))) {
-			throw new WebApplicationException(Status.FORBIDDEN); // 403
-		}
-
-		sheet.setCellRawValue(cell, rawValue);
-		twServer.put(sheet.getSheetId(), System.currentTimeMillis());
-	}
-
 	@Override
 	public void shareSpreadsheet(String sheetId, String userId, String password) {
 
-		if(!isPrimary) {
-			throw new WebApplicationException(Response.temporaryRedirect(
-				UriBuilder.fromUri(primaryURI).path(String.format("%s/%s/share/%s",RestSpreadsheets.PATH ,sheetId, userId))
-						.queryParam("password", password).build())
-				.build());
+		if (!isPrimary) {
+			throw new WebApplicationException(Response.temporaryRedirect(UriBuilder.fromUri(primaryURI)
+					.path(String.format("%s/%s/share/%s", RestSpreadsheets.PATH, sheetId, userId))
+					.queryParam("password", password).build()).build());
 		}
 
 		if (sheetId == null || userId == null || password == null) {
@@ -416,39 +358,15 @@ public class SpreadsheetsRepResource implements RestRepSpreadsheets {
 
 	}
 
-	private void share(String sheetId, String userId, String password) {
-		Spreadsheet sheet = sheets.get(sheetId);
-		if (sheet == null) {
-			throw new WebApplicationException(Status.NOT_FOUND); // 404
-		}
-
-		synchronized (this) {
-			boolean firstShare = false;
-			Set<String> sharedWith = sheet.getSharedWith();
-			if (sharedWith == null) {
-				sharedWith = new HashSet<String>();
-				firstShare = true;
-			} else if (sharedWith.contains(userId)) {
-				throw new WebApplicationException(Status.CONFLICT); // 409
-			}
-
-			sharedWith.add(userId);
-			if (firstShare) {
-				sheet.setSharedWith(sharedWith);
-			}
-		}
-	}
-
 	@Override
 	public void unshareSpreadsheet(String sheetId, String userId, String password) {
 
-		if(!isPrimary) {
-			throw new WebApplicationException(Response.temporaryRedirect(
-					UriBuilder.fromUri(primaryURI).path(String.format("%s/%s/share/%s",RestSpreadsheets.PATH ,sheetId, userId))
-							.queryParam("password", password).build())
-					.build());
+		if (!isPrimary) {
+			throw new WebApplicationException(Response.temporaryRedirect(UriBuilder.fromUri(primaryURI)
+					.path(String.format("%s/%s/share/%s", RestSpreadsheets.PATH, sheetId, userId))
+					.queryParam("password", password).build()).build());
 		}
-		
+
 		if (sheetId == null || userId == null || password == null) {
 			throw new WebApplicationException(Status.BAD_REQUEST); // 400
 		}
@@ -478,18 +396,29 @@ public class SpreadsheetsRepResource implements RestRepSpreadsheets {
 
 	}
 
-	private void unshare(String sheetId, String userId, String password) {
-		Spreadsheet sheet = sheets.get(sheetId);
-		if (sheet == null) {
-			throw new WebApplicationException(Status.NOT_FOUND); // 404
+	@Override
+	public void deleteUserSpreadsheets(String userId, String serverSecret) {
+
+		if (!isPrimary) {
+			throw new WebApplicationException(Response.temporaryRedirect(
+					UriBuilder.fromUri(primaryURI).path(String.format("%s/delete/%s", RestSpreadsheets.PATH, userId))
+							.queryParam("serverSecret", serverSecret).build())
+					.build());
 		}
 
-		synchronized (this) {
-			Set<String> sharedWith = sheet.getSharedWith();
-			if (sharedWith != null) {
-				sharedWith.remove(userId);
-			}
+		if (!serverSecret.equals(this.serverSecret)) {
+			throw new WebApplicationException(Status.FORBIDDEN);
 		}
+
+		if (userId == null) {
+			throw new WebApplicationException(Status.BAD_REQUEST); // 400
+		}
+
+		String[] params = new String[] { userId };
+		Operation operation = new Operation(repManager.getCurrentVersion() + 1, DELETE_USER, params);
+		handleRequest(operation);
+		deleteUser(userId);
+		repManager.addOperation(operation);
 	}
 
 	@Override
@@ -512,10 +441,11 @@ public class SpreadsheetsRepResource implements RestRepSpreadsheets {
 					// System.err.println("n deu para dar update");
 					throw new WebApplicationException(Response
 							.temporaryRedirect(UriBuilder.fromUri(primaryURI)
-									.path(String.format("%s/%s/range",RestSpreadsheets.PATH ,sheetId)).queryParam("userId", userId)
-									.queryParam("userDomain", userDomain).queryParam("range", range)
-									.queryParam("serverSecret", serverSecret).queryParam("twClient", twClient).build())
-							.header(RestSpreadsheets.HEADER_VERSION, version).build());
+									.path(String.format("%s/%s/range", RestSpreadsheets.PATH, sheetId))
+									.queryParam("userId", userId).queryParam("userDomain", userDomain)
+									.queryParam("range", range).queryParam("serverSecret", serverSecret)
+									.queryParam("twClient", twClient).build())
+									.header(RestSpreadsheets.HEADER_VERSION, version).build());
 				}
 			}
 		}
@@ -575,31 +505,326 @@ public class SpreadsheetsRepResource implements RestRepSpreadsheets {
 	}
 
 	@Override
-	public void deleteUserSpreadsheets(String userId, String serverSecret) {
-
-		if(!isPrimary) {
-			throw new WebApplicationException(Response.temporaryRedirect(
-				UriBuilder.fromUri(primaryURI).path(String.format("%s/delete/%s",RestSpreadsheets.PATH ,userId))
-						.queryParam("serverSecret", serverSecret).build())
-				.build());
-		}
-		
-		if (!serverSecret.equals(this.serverSecret)) {
+	public synchronized void executeOperation(Operation operation, String uri, String serverSecret) {
+		if (!serverSecret.equals(this.serverSecret) || !uri.equals(primaryURI)) {
 			throw new WebApplicationException(Status.FORBIDDEN);
 		}
 
-		if (userId == null) {
-			throw new WebApplicationException(Status.BAD_REQUEST); // 400
+		if (operation.getVersion() > repManager.getCurrentVersion() + 1) {
+			boolean success = false;
+			int retries = 0;
+
+			while (!success && retries < MAX_RETRIES) {
+				success = askForUpdate(primaryURI, operation.getVersion() - 1);
+			}
 		}
 
-		String[] params = new String[] { userId };
-		Operation operation = new Operation(repManager.getCurrentVersion() + 1, DELETE_USER, params);
-		handleRequest(operation);
-		deleteUser(userId);
+		if (operation.getVersion() == repManager.getCurrentVersion() + 1) {
+			operationBroker(operation);
+		}
+	}
+
+	@Override
+	public Operation[] getDataBase(String serverSecret) {
+		if (!serverSecret.equals(this.serverSecret)) {
+			throw new WebApplicationException(Status.FORBIDDEN);
+		}
+		return repManager.getAll();
+	}
+
+	@Override
+	public Operation[] getOperations(int firstOp, int nOperations, String serverSecret) {
+		if (!serverSecret.equals(this.serverSecret)) {
+			throw new WebApplicationException(Status.FORBIDDEN);
+		}
+		return repManager.getOperations(firstOp, nOperations);
+	}
+
+	@Override
+	public int getVersion(String serverSecret) {
+		if (!serverSecret.equals(this.serverSecret)) {
+			throw new WebApplicationException(Status.FORBIDDEN);
+		}
+		return repManager.getCurrentVersion();
+	}
+
+	private void monitorDomain() {
+		List<String> lst = zk.getChildren(path);
+		findPrimary(lst);
+
+		zk.getChildren(path, new Watcher() {
+			@Override
+			public void process(WatchedEvent event) {
+				List<String> lst = zk.getChildren(path, this);
+				findPrimary(lst);
+				getMostRecentVersion(lst);
+			}
+		});
+	}
+
+	private void findPrimary(List<String> lst) {
+		int minSeq = Integer.MAX_VALUE;
+		lst.stream().forEach(e -> {
+			int seqNum = Integer.parseInt(e.split("_")[1]);
+			if (seqNum < minSeq) {
+				primaryURI = zk.getValue(String.format("/%s/%s", domain, e));
+				if (primaryURI.equals(serverURI)) {
+					isPrimary = true;
+				} else {
+					isPrimary = false;
+				}
+			}
+		});
+	}
+
+	private void getMostRecentVersion(List<String> lst) {
+		MostRecentVersion mostRecentVersion = new MostRecentVersion();
+		List<Thread> threads = new ArrayList<Thread>(lst.size());
+		lst.stream().forEach(e -> {
+			Thread thread = new Thread(() -> {
+				String currURI = zk.getValue(String.format("/%s/%s", domain, e));
+				int version = getReplicaCurrVersion(currURI);
+				mostRecentVersion.setHigherVersion(version, currURI);
+			});
+			threads.add(thread);
+			thread.start();
+		});
+
+		for (;;) {
+			boolean isRunning = false;
+			for (Thread thread : threads)
+				if (thread.isAlive())
+					isRunning = true;
+			if (!isRunning)
+				break;
+			try {
+				Thread.sleep(250);
+			} catch (Exception e) {
+			}
+		}
+
+		if (!(mostRecentVersion.getUrl().equals(serverURI))) {
+			askForUpdate(mostRecentVersion.getUrl(), mostRecentVersion.getVersion());
+		}
+	}
+
+	private void getCurrentState() {
+		int retries = 0;
+		boolean success = false;
+
+		while (!success && retries < MAX_RETRIES) {
+			WebTarget target = client.target(primaryURI).path(RestSpreadsheets.PATH).path("state");
+			try {
+				Response r = target.queryParam("serverSecret", serverSecret).request()
+						.accept(MediaType.APPLICATION_JSON).get();
+
+				if (r.getStatus() == Status.OK.getStatusCode()) {
+					Operation[] operations = r.readEntity(Operation[].class);
+					for (Operation op : operations) {
+						operationBroker(op);
+					}
+				}
+
+				success = true;
+
+			} catch (ProcessingException pe) {
+				retries++;
+				try {
+					Thread.sleep(RETRY_PERIOD);
+				} catch (InterruptedException ie) {
+				}
+			}
+		}
+	}
+
+	private int getReplicaCurrVersion(String replicaURI) {
+		int retries = 0;
+
+		while (retries < MAX_RETRIES) {
+			WebTarget target = client.target(replicaURI).path(RestSpreadsheets.PATH).path("version");
+			try {
+				Response r = target.queryParam("serverSecret", serverSecret).request()
+						.accept(MediaType.APPLICATION_JSON).get();
+
+				if (r.getStatus() == Status.OK.getStatusCode()) {
+					int version = r.readEntity(Integer.class);
+					return version;
+				}
+			} catch (ProcessingException pe) {
+				retries++;
+				try {
+					Thread.sleep(RETRY_PERIOD);
+				} catch (InterruptedException ie) {
+				}
+			}
+		}
+		return -1;
+	}
+
+	private void handleRequest(Operation operation) {
+		List<String> lst = zk.getChildren(path);
+		AckCheck sendToSecondaries = new AckCheck();
+		List<Thread> threads = new ArrayList<Thread>(lst.size());
+		lst.stream().forEach(e -> {
+			Thread thread = new Thread(() -> {
+				String replicaURI = zk.getValue(String.format("/%s/%s", domain, e));
+				if (!replicaURI.equals(serverURI)) {
+					int retries = 0;
+					boolean success = false;
+					WebTarget target = client.target(replicaURI).path(RestSpreadsheets.PATH).path("execute");
+
+					while (!success && retries < MAX_RETRIES) {
+						try {
+							Response r = target.queryParam("serverSecret", serverSecret).queryParam("uri", serverURI)
+									.request().post(Entity.entity(operation, MediaType.APPLICATION_JSON));
+
+							if (r.getStatus() == Status.NO_CONTENT.getStatusCode()) {
+								sendToSecondaries.acksInc();
+							}
+
+							success = true;
+
+						} catch (ProcessingException pe) {
+							retries++;
+							try {
+								Thread.sleep(RETRY_PERIOD);
+							} catch (InterruptedException ie) {
+							}
+						}
+					}
+				}
+			});
+			threads.add(thread);
+			thread.start();
+		});
+
+		while (!sendToSecondaries.hasSucceded()) {
+			boolean isRunning = false;
+			for (Thread thread : threads)
+				if (thread.isAlive())
+					isRunning = true;
+			if (!isRunning)
+				break;
+			try {
+				Thread.sleep(250);
+			} catch (Exception e) {
+			}
+		}
+		if (!sendToSecondaries.hasSucceded())
+			throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR); //500
+
+	}
+
+	private void operationBroker(Operation operation) {
+		String[] params = operation.getParams();
+		switch (operation.getOperation()) {
+			case CREATE:
+				Spreadsheet sheet = json.fromJson(params[0], Spreadsheet.class);
+				create(sheet, params[1]);
+				break;
+			case DELETE:
+				delete(params[0], params[1]);
+				break;
+			case UPDATE:
+				update(params[0], params[1], params[2], params[3], params[4]);
+				break;
+			case SHARE:
+				share(params[0], params[1], params[2]);
+				break;
+			case UNSHARE:
+				unshare(params[0], params[1], params[2]);
+				break;
+			case DELETE_USER:
+				deleteUser(params[0]);
+				break;
+			default:
+		}
 		repManager.addOperation(operation);
 	}
 
-	public void deleteUser(String userId) {
+	private String create(Spreadsheet sheet, String password) {
+		synchronized (this) {
+			String id = sheet.getSheetId();
+			sheets.put(id, sheet);
+
+			Set<String> sheetsSet = userSheets.get(sheet.getOwner());
+			if (sheetsSet == null) {
+				sheetsSet = new HashSet<String>();
+			}
+
+			sheetsSet.add(id);
+			userSheets.put(sheet.getOwner(), sheetsSet);
+			twServer.put(id, System.currentTimeMillis());
+		}
+
+		return sheet.getSheetId();
+	}
+
+	private void delete(String sheetId, String password) {
+
+		synchronized (this) {
+			Spreadsheet sheet = sheets.get(sheetId);
+			if (sheet == null) {
+				throw new WebApplicationException(Status.NOT_FOUND); // 404
+			}
+			sheets.remove(sheetId);
+			userSheets.get(sheet.getOwner()).remove(sheetId);
+			twServer.remove(sheetId);
+		}
+	}
+
+	private void update(String sheetId, String cell, String rawValue, String userId, String password) {
+		Spreadsheet sheet = sheets.get(sheetId);
+		if (sheet == null) {
+			throw new WebApplicationException(Status.NOT_FOUND); // 404
+		}
+		if (!sheet.getOwner().equals(userId) && ((sheet.getSharedWith() == null)
+				|| (!sheet.getSharedWith().contains(String.format("%s@%s", userId, domain))))) {
+			throw new WebApplicationException(Status.FORBIDDEN); // 403
+		}
+
+		sheet.setCellRawValue(cell, rawValue);
+		twServer.put(sheet.getSheetId(), System.currentTimeMillis());
+	}
+
+	private void share(String sheetId, String userId, String password) {
+		Spreadsheet sheet = sheets.get(sheetId);
+		if (sheet == null) {
+			throw new WebApplicationException(Status.NOT_FOUND); // 404
+		}
+
+		synchronized (this) {
+			boolean firstShare = false;
+			Set<String> sharedWith = sheet.getSharedWith();
+			if (sharedWith == null) {
+				sharedWith = new HashSet<String>();
+				firstShare = true;
+			} else if (sharedWith.contains(userId)) {
+				throw new WebApplicationException(Status.CONFLICT); // 409
+			}
+
+			sharedWith.add(userId);
+			if (firstShare) {
+				sheet.setSharedWith(sharedWith);
+			}
+		}
+	}
+
+	private void unshare(String sheetId, String userId, String password) {
+		Spreadsheet sheet = sheets.get(sheetId);
+		if (sheet == null) {
+			throw new WebApplicationException(Status.NOT_FOUND); // 404
+		}
+
+		synchronized (this) {
+			Set<String> sharedWith = sheet.getSharedWith();
+			if (sharedWith != null) {
+				sharedWith.remove(userId);
+			}
+		}
+	}
+
+	private void deleteUser(String userId) {
 		synchronized (this) {
 			Set<String> sheetIds = userSheets.get(userId);
 			if (sheetIds != null) {
@@ -612,6 +837,40 @@ public class SpreadsheetsRepResource implements RestRepSpreadsheets {
 		}
 	}
 
+	private synchronized boolean askForUpdate(String URI, int lastVersion) {
+		int retries = 0;
+		int firstOp = repManager.getCurrentVersion() + 1;
+		if (firstOp >= lastVersion) {
+			return true;
+		}
+		int nOperations = (lastVersion - firstOp) + 1; // gets all operations, lastVersion inclusive
+
+		while (retries < MAX_RETRIES) {
+			WebTarget target = client.target(URI).path(RestSpreadsheets.PATH).path("operations");
+			try {
+				Response r = target.queryParam("firstOp", firstOp).queryParam("nOperations", nOperations)
+						.queryParam("serverSecret", serverSecret).request().accept(MediaType.APPLICATION_JSON).get();
+
+				if (r.getStatus() == Status.OK.getStatusCode()) {
+					Operation[] operations = r.readEntity(Operation[].class);
+					for (Operation op : operations) {
+						operationBroker(op);
+					}
+
+					return true;
+				}
+
+			} catch (ProcessingException pe) {
+				retries++;
+				try {
+					Thread.sleep(RETRY_PERIOD);
+				} catch (InterruptedException ie) {
+				}
+			}
+		}
+		return false;
+	}
+	
 	private int requestUser(String userDomain, String userId, String password) {
 
 		URI[] uri = null;
@@ -686,7 +945,6 @@ public class SpreadsheetsRepResource implements RestRepSpreadsheets {
 				}
 			}
 		}
-
 		return 0;
 	}
 
@@ -909,294 +1167,5 @@ public class SpreadsheetsRepResource implements RestRepSpreadsheets {
 			throw new WebApplicationException(Status.FORBIDDEN); // 403
 		}
 	}
-
-	private void monitorDomain() {
-		List<String> lst = zk.getChildren(path);
-		findPrimary(lst);
-
-		zk.getChildren(path, new Watcher() {
-			@Override
-			public void process(WatchedEvent event) {
-				List<String> lst = zk.getChildren(path, this);
-				findPrimary(lst);
-				getMostRecentVersion(lst);
-			}
-		});
-
-	}
-
-	private void findPrimary(List<String> lst) {
-		int minSeq = Integer.MAX_VALUE;
-		lst.stream().forEach(e -> {
-			int seqNum = Integer.parseInt(e.split("_")[1]);
-			if (seqNum < minSeq) {
-				primaryURI = zk.getValue(String.format("/%s/%s", domain, e));
-				// System.out.println(primaryURI);
-				if (primaryURI.equals(serverURI)) {
-					isPrimary = true;
-				} else {
-					isPrimary = false;
-				}
-			}
-		});
-		// System.out.println(primaryURI);
-		// System.out.println(isPrimary);
-	}
-
-	private void handleRequest(Operation operation) {
-		List<String> lst = zk.getChildren(path);
-		AckCheck sendToSecondaries = new AckCheck();
-		List<Thread> threads = new ArrayList<Thread>(lst.size());
-		lst.stream().forEach(e -> {
-			Thread thread = new Thread(() -> {
-				String replicaURI = zk.getValue(String.format("/%s/%s", domain, e));
-				if (!replicaURI.equals(serverURI)) {
-					int retries = 0;
-					boolean success = false;
-					WebTarget target = client.target(replicaURI).path(RestSpreadsheets.PATH).path("execute");
-
-					while (!success && retries < MAX_RETRIES) {
-						try {
-							Response r = target.queryParam("serverSecret", serverSecret)
-									.queryParam("uri", serverURI).request()
-									.post(Entity.entity(operation, MediaType.APPLICATION_JSON));
-
-							if (r.getStatus() == Status.NO_CONTENT.getStatusCode()) {
-								// System.out.println("executou");
-								// System.out.println(e);
-								sendToSecondaries.acksInc();
-							}
-							// System.out.println(r.getStatus());
-							success = true;
-							// System.out.println("nao executou");
-						} catch (ProcessingException pe) {
-							retries++;
-							try {
-								Thread.sleep(RETRY_PERIOD);
-							} catch (InterruptedException ie) {
-							}
-						}
-					}
-				}
-			});
-			threads.add(thread);
-			thread.start();
-		});
-
-		while (!sendToSecondaries.hasSucceded()) {
-		boolean isRunning = false;
-		for (Thread thread : threads)
-		if (thread.isAlive())
-		isRunning = true;
-		if (!isRunning)
-		break;
-		try {
-		Thread.sleep(250);
-		} catch (Exception e) {
-		}
-		}
-		if (!sendToSecondaries.hasSucceded())
-		throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
-
-	}
-
-	private synchronized boolean askForUpdate(String URI, int lastVersion) {// este last version e a primeira versao que
-																			// nao e atualizada
-		int retries = 0;
-		int firstOp = repManager.getCurrentVersion() + 1;
-		if (firstOp >= lastVersion) {
-			return true;
-		}
-		int nOperations = (lastVersion - firstOp) + 1; // faz as ops antigas que faltavam inclusive a lastversion
-
-		while (retries < MAX_RETRIES) {
-			WebTarget target = client.target(URI).path(RestSpreadsheets.PATH).path("operations");
-			try {
-				Response r = target.queryParam("firstOp", firstOp).queryParam("nOperations", nOperations)
-						.queryParam("serverSecret", serverSecret).request().accept(MediaType.APPLICATION_JSON).get();
-
-				if (r.getStatus() == Status.OK.getStatusCode()) {
-					Operation[] operations = r.readEntity(Operation[].class);
-					for (Operation op : operations) {
-						operationBroker(op);
-					}
-
-					return true;
-				}
-
-			} catch (ProcessingException pe) {
-				retries++;
-				try {
-					Thread.sleep(RETRY_PERIOD);
-				} catch (InterruptedException ie) {
-				}
-			}
-		}
-		return false;
-	}
-
-	@Override
-	public synchronized void executeOperation(Operation operation, String uri, String serverSecret) {
-		if (!serverSecret.equals(this.serverSecret) || !uri.equals(primaryURI)) {
-			throw new WebApplicationException(Status.FORBIDDEN);
-		}
-
-		if (operation.getVersion() > repManager.getCurrentVersion() + 1) {
-			boolean success = false;
-			int retries = 0;
-
-			while (!success && retries < MAX_RETRIES) {
-				success = askForUpdate(primaryURI, operation.getVersion()-1);
-			}
-		}
-
-		if (operation.getVersion() == repManager.getCurrentVersion() + 1) {
-			operationBroker(operation);
-		} else {
-			// System.out.println(operation.getVersion());
-			// System.out.println(repManager.getCurrentVersion() + 1);
-		}
-
-	}
-
-	private void getCurrentState() {
-		int retries = 0;
-		boolean success = false;
-
-		while (!success && retries < MAX_RETRIES) {
-			WebTarget target = client.target(primaryURI).path(RestSpreadsheets.PATH).path("state");
-			try {
-				Response r = target.queryParam("serverSecret", serverSecret).request()
-						.accept(MediaType.APPLICATION_JSON).get();
-
-				if (r.getStatus() == Status.OK.getStatusCode()) {
-					Operation[] operations = r.readEntity(Operation[].class); // sera q e preciso usar gson?
-					for (Operation op : operations) {
-						operationBroker(op);
-					}
-				}
-
-				success = true;
-
-			} catch (ProcessingException pe) {
-				retries++;
-				try {
-					Thread.sleep(RETRY_PERIOD);
-				} catch (InterruptedException ie) {
-				}
-			}
-		}
-	}
-
-	private void getMostRecentVersion(List<String> lst) {
-
-		MostRecentVersion mostRecentVersion = new MostRecentVersion();
-		List<Thread> threads = new ArrayList<Thread>(lst.size());
-		lst.stream().forEach(e -> {
-			Thread thread = new Thread(() -> {
-				String currURI = zk.getValue(String.format("/%s/%s", domain, e));
-				int version = getReplicaCurrVersion(currURI);
-				mostRecentVersion.setHigherVersion(version, currURI);
-			});
-			threads.add(thread);
-			thread.start();
-		});
-
-		for(;;) {
-			boolean isRunning = false;
-			for (Thread thread : threads)
-				if (thread.isAlive())
-					isRunning = true;
-			if (!isRunning)
-				break;
-			try {
-				Thread.sleep(250);
-			} catch (Exception e) {
-			}
-		}
-
-		if (!(mostRecentVersion.getUrl().equals(serverURI))) {
-			askForUpdate(mostRecentVersion.getUrl(), mostRecentVersion.getVersion());
-		}
-		
-	}
-
-	private int getReplicaCurrVersion(String replicaURI) {
-		int retries = 0;
-
-		while (retries < MAX_RETRIES) {
-			WebTarget target = client.target(replicaURI).path(RestSpreadsheets.PATH).path("version");
-			try {
-				Response r = target.queryParam("serverSecret", serverSecret).request()
-						.accept(MediaType.APPLICATION_JSON).get();
-
-				if (r.getStatus() == Status.OK.getStatusCode()) {
-					int version = r.readEntity(Integer.class);
-					return version;
-				}
-			} catch (ProcessingException pe) {
-				retries++;
-				try {
-					Thread.sleep(RETRY_PERIOD);
-				} catch (InterruptedException ie) {
-				}
-			}
-		}
-		return -1;
-	}
-
-	private void operationBroker(Operation operation) {
-		String[] params = operation.getParams();
-		switch (operation.getOperation()) {
-			case CREATE:
-				Spreadsheet sheet = json.fromJson(params[0], Spreadsheet.class);
-				// System.out.println(sheet);
-				create(sheet, params[1]);
-				break;
-			case DELETE:
-				delete(params[0], params[1]);
-				break;
-			case UPDATE:
-				update(params[0], params[1], params[2], params[3], params[4]);
-				break;
-			case SHARE:
-				share(params[0], params[1], params[2]);
-				break;
-			case UNSHARE:
-				unshare(params[0], params[1], params[2]);
-				break;
-			case DELETE_USER:
-				deleteUser(params[0]);
-				break;
-			default:
-		}
-		repManager.addOperation(operation);
-		// System.out.println("what");
-	}
-
-	@Override
-	public Operation[] getDataBase(String serverSecret) {
-		if (!serverSecret.equals(this.serverSecret)) {
-			throw new WebApplicationException(Status.FORBIDDEN);
-		}
-		return repManager.getAll();
-	}
-
-	@Override
-	public Operation[] getOperations(int firstOp, int nOperations, String serverSecret) {
-		if (!serverSecret.equals(this.serverSecret)) {
-			throw new WebApplicationException(Status.FORBIDDEN);
-		}
-
-		return repManager.getOperations(firstOp, nOperations);
-	}
-
-	@Override
-	public int getVersion(String serverSecret) {
-		if (!serverSecret.equals(this.serverSecret)) {
-			throw new WebApplicationException(Status.FORBIDDEN);
-		}
-
-		return repManager.getCurrentVersion();
-	}
-}
+	
+}                                                                             

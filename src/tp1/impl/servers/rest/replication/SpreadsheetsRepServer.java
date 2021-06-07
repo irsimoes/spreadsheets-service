@@ -44,9 +44,8 @@ public class SpreadsheetsRepServer {
 			ReplicationManager repManager = new ReplicationManager();
 			ResourceConfig config = new ResourceConfig();
 
-			System.out.println(zk.write(path, CreateMode.PERSISTENT));
-			System.out.println(zk.write(String.format("%s/sheets_", path), serverURI, CreateMode.EPHEMERAL_SEQUENTIAL));
-			System.out.println(URI.create(serverURI).toString());
+			zk.write(path, CreateMode.PERSISTENT);
+			zk.write(String.format("%s/sheets_", path), serverURI, CreateMode.EPHEMERAL_SEQUENTIAL);
 
 			config.register(new SpreadsheetsRepResource(args[0], serverURI, args[1], args[2], discovery, zk, repManager));
 			config.register(new VersionFilter(repManager));

@@ -19,7 +19,6 @@ import org.glassfish.jersey.client.ClientProperties;
 import com.google.gson.Gson;
 import com.sun.xml.ws.client.BindingProviderProperties;
 
-import jakarta.inject.Singleton;
 import jakarta.jws.WebService;
 import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.WebApplicationException;
@@ -47,7 +46,6 @@ import tp1.util.CellRange;
 
 @WebService(serviceName = SoapSpreadsheets.NAME, targetNamespace = SoapSpreadsheets.NAMESPACE, endpointInterface = SoapSpreadsheets.INTERFACE)
 
-@Singleton
 public class SpreadsheetsWS implements SoapSpreadsheets {
 
 	public final static String SHEETS_WSDL = "/spreadsheets/?wsdl";
@@ -60,23 +58,23 @@ public class SpreadsheetsWS implements SoapSpreadsheets {
 	public static final int CACHE_VALIDITY_TIME = 20000;
 	public static final String GOOGLE_SHEETS = "https://sheets.googleapis.com";
 
-	private final Map<String, Spreadsheet> sheets = new HashMap<String, Spreadsheet>();
-	private final Map<String, Set<String>> userSheets = new HashMap<String, Set<String>>();
-	private final Map<String, ValuesResult> cache = new HashMap<String, ValuesResult>();
-	private final Map<String, Long> twServer = new HashMap<String, Long>();
-	private final Map<String, Long> tc = new HashMap<String, Long>();
-	private static Discovery discovery;
-	private static String domain, serverSecret, googleKey;
-	private static Client client;
+	private Map<String, Spreadsheet> sheets = new HashMap<String, Spreadsheet>();
+	private Map<String, Set<String>> userSheets = new HashMap<String, Set<String>>();
+	private Map<String, ValuesResult> cache = new HashMap<String, ValuesResult>();
+	private Map<String, Long> twServer = new HashMap<String, Long>();
+	private Map<String, Long> tc = new HashMap<String, Long>();
+	private Discovery discovery;
+	private String domain, serverSecret, googleKey;
+	private Client client;
 
 	public SpreadsheetsWS() {
 	}
 
 	public SpreadsheetsWS(String domain, String serverSecret, String googleKey, Discovery discovery) {
-		SpreadsheetsWS.discovery = discovery;
-		SpreadsheetsWS.domain = domain;
-		SpreadsheetsWS.serverSecret = serverSecret;
-		SpreadsheetsWS.googleKey = googleKey;
+		this.discovery = discovery;
+		this.domain = domain;
+		this.serverSecret = serverSecret;
+		this.googleKey = googleKey;
 
 		ClientConfig config = new ClientConfig();
 		config.property(ClientProperties.CONNECT_TIMEOUT, CONNECTION_TIMEOUT);
@@ -314,7 +312,7 @@ public class SpreadsheetsWS implements SoapSpreadsheets {
 	public ValuesResult getRange(String sheetId, String userId, String userDomain, String range, String serverSecret,
 			long twClient) throws SheetsException {
 
-		if (!serverSecret.equals(SpreadsheetsWS.serverSecret)) {
+		if (!serverSecret.equals(this.serverSecret)) {
 			throw new SheetsException();
 		}
 
@@ -378,7 +376,7 @@ public class SpreadsheetsWS implements SoapSpreadsheets {
 
 	@Override
 	public void deleteUserSpreadsheets(String userId, String serverSecret) throws SheetsException {
-		if (!serverSecret.equals(SpreadsheetsWS.serverSecret)) {
+		if (!serverSecret.equals(this.serverSecret)) {
 			throw new SheetsException();
 		}
 
@@ -622,12 +620,6 @@ public class SpreadsheetsWS implements SoapSpreadsheets {
 
 		} else {
 
-			try {
-				throw new RuntimeException();
-			} catch (Exception e) {
-				System.err.println("vou me matar");
-			}
-
 			if (valuesResult == null || System.currentTimeMillis() - tc.get(sheetURL) > CACHE_VALIDITY_TIME) {
 				SoapSpreadsheets sheets = null;
 
@@ -649,10 +641,8 @@ public class SpreadsheetsWS implements SoapSpreadsheets {
 					}
 				}
 
-				((BindingProvider) sheets).getRequestContext().put(BindingProviderProperties.CONNECT_TIMEOUT,
-						CONNECTION_TIMEOUT);
-				((BindingProvider) sheets).getRequestContext().put(BindingProviderProperties.REQUEST_TIMEOUT,
-						REPLY_TIMEOUT);
+				((BindingProvider) sheets).getRequestContext().put(BindingProviderProperties.CONNECT_TIMEOUT, CONNECTION_TIMEOUT);
+				((BindingProvider) sheets).getRequestContext().put(BindingProviderProperties.REQUEST_TIMEOUT, REPLY_TIMEOUT);
 
 				retries = 0;
 
@@ -688,7 +678,6 @@ public class SpreadsheetsWS implements SoapSpreadsheets {
 					}
 				}
 			}
-
 		}
 
 		if (valuesResult != null && valuesResult.getSharedWith().contains(String.format("%s@%s", owner, domain))) {
