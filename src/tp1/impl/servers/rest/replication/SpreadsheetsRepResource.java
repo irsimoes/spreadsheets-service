@@ -8,12 +8,10 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.xml.namespace.QName;
 
@@ -115,17 +113,15 @@ public class SpreadsheetsRepResource implements RestRepSpreadsheets {
 
 		if (!isPrimary) {
 			throw new WebApplicationException(Response.temporaryRedirect(
-					UriBuilder.fromUri(primaryURI).path("spreadsheets").queryParam("password", password).build())
+					UriBuilder.fromUri(primaryURI).path(RestSpreadsheets.PATH).queryParam("password", password).build())
 					.build());
 		}
 
-		// }
 		if (sheet == null || password == null || sheet.getSheetId() != null || sheet.getSheetURL() != null
 				|| sheet.getRows() < 0 || sheet.getColumns() < 0) {
 			throw new WebApplicationException(Status.BAD_REQUEST); // 400
 		}
 
-		// System.err.println(":((");
 		int status = requestUser(domain, sheet.getOwner(), password);
 		if (status != Status.OK.getStatusCode()) {
 			throw new WebApplicationException(Status.BAD_REQUEST); // 400
@@ -179,6 +175,11 @@ public class SpreadsheetsRepResource implements RestRepSpreadsheets {
 			throw new WebApplicationException(Status.BAD_REQUEST); // 400
 		}
 
+		if(!isPrimary) {
+			throw new WebApplicationException(Response.temporaryRedirect(UriBuilder.fromUri(primaryURI)
+					.path(String.format("%s/%s", RestSpreadsheets.PATH, sheetId)).queryParam("password", password).build()).build());
+		}
+
 		String owner;
 		synchronized (this) {
 			Spreadsheet sheet = sheets.get(sheetId);
@@ -193,17 +194,11 @@ public class SpreadsheetsRepResource implements RestRepSpreadsheets {
 			throw new WebApplicationException(status); // 403 or 404
 		}
 
-		// ZONA PRIMARIO OU SECUNDARIO, REDIRECIONA OU ESPERA ACKS
-		if (isPrimary) {
-			String[] params = new String[] { sheetId, password };
-			Operation operation = new Operation(repManager.getCurrentVersion() + 1, DELETE, params);
-			handleRequest(operation);
-			delete(sheetId, password);
-			repManager.addOperation(operation);
-		} else {
-			throw new WebApplicationException(Response.temporaryRedirect(UriBuilder.fromUri(primaryURI)
-					.path(String.format("spreadsheets/%s", sheetId)).queryParam("password", password).build()).build());
-		}
+		String[] params = new String[] { sheetId, password };
+		Operation operation = new Operation(repManager.getCurrentVersion() + 1, DELETE, params);
+		handleRequest(operation);
+		delete(sheetId, password);
+		repManager.addOperation(operation);
 	}
 
 	private void delete(String sheetId, String password) {
@@ -235,7 +230,7 @@ public class SpreadsheetsRepResource implements RestRepSpreadsheets {
 				if (!success) {
 					throw new WebApplicationException(Response
 							.temporaryRedirect(
-									UriBuilder.fromUri(primaryURI).path(String.format("spreadsheets/%s", sheetId))
+									UriBuilder.fromUri(primaryURI).path(String.format("%s/%s",RestSpreadsheets.PATH ,sheetId))
 											.queryParam("userId", userId).queryParam("password", password).build())
 							.header(RestSpreadsheets.HEADER_VERSION, version).build());
 				}
@@ -283,7 +278,7 @@ public class SpreadsheetsRepResource implements RestRepSpreadsheets {
 					System.out.println("nao teve sucesso " + sheetId);
 					throw new WebApplicationException(Response
 							.temporaryRedirect(UriBuilder.fromUri(primaryURI)
-									.path(String.format("spreadsheets/%s/values", sheetId)).queryParam("userId", userId)
+									.path(String.format("%s/%s/values",RestSpreadsheets.PATH ,sheetId)).queryParam("userId", userId)
 									.queryParam("password", password).build())
 							.header(RestSpreadsheets.HEADER_VERSION, version).build());
 				}
@@ -344,6 +339,14 @@ public class SpreadsheetsRepResource implements RestRepSpreadsheets {
 
 	@Override
 	public void updateCell(String sheetId, String cell, String rawValue, String userId, String password) {
+
+		if(!isPrimary) {
+			throw new WebApplicationException(Response.temporaryRedirect(
+					UriBuilder.fromUri(primaryURI).path(String.format("%s/%s/%s",RestSpreadsheets.PATH ,sheetId, cell))
+							.queryParam("userId", userId).queryParam("password", password).build())
+					.build());
+		}
+
 		if (sheetId == null || userId == null || password == null || rawValue == null) {
 			throw new WebApplicationException(Status.BAD_REQUEST); // 400
 		}
@@ -353,20 +356,11 @@ public class SpreadsheetsRepResource implements RestRepSpreadsheets {
 			throw new WebApplicationException(status); // 403 or 404
 		}
 
-		// ZONA PRIMARIO OU SECUNDARIO, REDIRECIONA OU ESPERA ACKS
-		if (isPrimary) {
-			String[] params = new String[] { sheetId, cell, rawValue, userId, password };
-			Operation operation = new Operation(repManager.getCurrentVersion() + 1, UPDATE, params);
-			handleRequest(operation);
-			update(sheetId, cell, rawValue, userId, password);
-			repManager.addOperation(operation);
-
-		} else {
-			throw new WebApplicationException(Response.temporaryRedirect(
-					UriBuilder.fromUri(primaryURI).path(String.format("spreadsheets/%s/%s", sheetId, cell))
-							.queryParam("userId", userId).queryParam("password", password).build())
-					.build());
-		}
+		String[] params = new String[] { sheetId, cell, rawValue, userId, password };
+		Operation operation = new Operation(repManager.getCurrentVersion() + 1, UPDATE, params);
+		handleRequest(operation);
+		update(sheetId, cell, rawValue, userId, password);
+		repManager.addOperation(operation);
 	}
 
 	private void update(String sheetId, String cell, String rawValue, String userId, String password) {
@@ -385,6 +379,13 @@ public class SpreadsheetsRepResource implements RestRepSpreadsheets {
 
 	@Override
 	public void shareSpreadsheet(String sheetId, String userId, String password) {
+
+		if(!isPrimary) {
+			throw new WebApplicationException(Response.temporaryRedirect(
+				UriBuilder.fromUri(primaryURI).path(String.format("%s/%s/share/%s",RestSpreadsheets.PATH ,sheetId, userId))
+						.queryParam("password", password).build())
+				.build());
+		}
 
 		if (sheetId == null || userId == null || password == null) {
 			throw new WebApplicationException(Status.BAD_REQUEST); // 400
@@ -407,19 +408,11 @@ public class SpreadsheetsRepResource implements RestRepSpreadsheets {
 			throw new WebApplicationException(status); // 403 or 404
 		}
 
-		// ZONA PRIMARIO OU SECUNDARIO, REDIRECIONA OU ESPERA ACKS
-		if (isPrimary) {
-			String[] params = new String[] { sheetId, userId, password };
-			Operation operation = new Operation(repManager.getCurrentVersion() + 1, SHARE, params);
-			handleRequest(operation);
-			share(sheetId, userId, password);
-			repManager.addOperation(operation);
-		} else {
-			throw new WebApplicationException(Response.temporaryRedirect(
-					UriBuilder.fromUri(primaryURI).path(String.format("spreadsheets/%s/share/%s", sheetId, userId))
-							.queryParam("password", password).build())
-					.build());
-		}
+		String[] params = new String[] { sheetId, userId, password };
+		Operation operation = new Operation(repManager.getCurrentVersion() + 1, SHARE, params);
+		handleRequest(operation);
+		share(sheetId, userId, password);
+		repManager.addOperation(operation);
 
 	}
 
@@ -448,6 +441,14 @@ public class SpreadsheetsRepResource implements RestRepSpreadsheets {
 
 	@Override
 	public void unshareSpreadsheet(String sheetId, String userId, String password) {
+
+		if(!isPrimary) {
+			throw new WebApplicationException(Response.temporaryRedirect(
+					UriBuilder.fromUri(primaryURI).path(String.format("%s/%s/share/%s",RestSpreadsheets.PATH ,sheetId, userId))
+							.queryParam("password", password).build())
+					.build());
+		}
+		
 		if (sheetId == null || userId == null || password == null) {
 			throw new WebApplicationException(Status.BAD_REQUEST); // 400
 		}
@@ -469,20 +470,11 @@ public class SpreadsheetsRepResource implements RestRepSpreadsheets {
 			throw new WebApplicationException(status); // 403 or 404
 		}
 
-		// ZONA PRIMARIO OU SECUNDARIO, REDIRECIONA OU ESPERA ACKS
-		if (isPrimary) {
-			String[] params = new String[] { sheetId, userId, password };
-			Operation operation = new Operation(repManager.getCurrentVersion() + 1, UNSHARE, params);
-			handleRequest(operation);
-			unshare(sheetId, userId, password);
-			repManager.addOperation(operation);
-
-		} else {
-			throw new WebApplicationException(Response.temporaryRedirect(
-					UriBuilder.fromUri(primaryURI).path(String.format("spreadsheets/%s/share/%s", sheetId, userId))
-							.queryParam("password", password).build())
-					.build());
-		}
+		String[] params = new String[] { sheetId, userId, password };
+		Operation operation = new Operation(repManager.getCurrentVersion() + 1, UNSHARE, params);
+		handleRequest(operation);
+		unshare(sheetId, userId, password);
+		repManager.addOperation(operation);
 
 	}
 
@@ -520,7 +512,7 @@ public class SpreadsheetsRepResource implements RestRepSpreadsheets {
 					// System.err.println("n deu para dar update");
 					throw new WebApplicationException(Response
 							.temporaryRedirect(UriBuilder.fromUri(primaryURI)
-									.path(String.format("spreadsheets/%s/range", sheetId)).queryParam("userId", userId)
+									.path(String.format("%s/%s/range",RestSpreadsheets.PATH ,sheetId)).queryParam("userId", userId)
 									.queryParam("userDomain", userDomain).queryParam("range", range)
 									.queryParam("serverSecret", serverSecret).queryParam("twClient", twClient).build())
 							.header(RestSpreadsheets.HEADER_VERSION, version).build());
@@ -584,6 +576,14 @@ public class SpreadsheetsRepResource implements RestRepSpreadsheets {
 
 	@Override
 	public void deleteUserSpreadsheets(String userId, String serverSecret) {
+
+		if(!isPrimary) {
+			throw new WebApplicationException(Response.temporaryRedirect(
+				UriBuilder.fromUri(primaryURI).path(String.format("%s/delete/%s",RestSpreadsheets.PATH ,userId))
+						.queryParam("serverSecret", serverSecret).build())
+				.build());
+		}
+		
 		if (!serverSecret.equals(this.serverSecret)) {
 			throw new WebApplicationException(Status.FORBIDDEN);
 		}
@@ -592,20 +592,11 @@ public class SpreadsheetsRepResource implements RestRepSpreadsheets {
 			throw new WebApplicationException(Status.BAD_REQUEST); // 400
 		}
 
-		// ZONA PRIMARIO OU SECUNDARIO, REDIRECIONA OU ESPERA ACKS
-		if (isPrimary) {
-			String[] params = new String[] { userId };
-			Operation operation = new Operation(repManager.getCurrentVersion() + 1, DELETE_USER, params);
-			handleRequest(operation);
-			deleteUser(userId);
-			repManager.addOperation(operation);
-
-		} else {
-			throw new WebApplicationException(Response.temporaryRedirect(
-					UriBuilder.fromUri(primaryURI).path(String.format("spreadsheets/delete/%s", userId))
-							.queryParam("serverSecret", serverSecret).build())
-					.build());
-		}
+		String[] params = new String[] { userId };
+		Operation operation = new Operation(repManager.getCurrentVersion() + 1, DELETE_USER, params);
+		handleRequest(operation);
+		deleteUser(userId);
+		repManager.addOperation(operation);
 	}
 
 	public void deleteUser(String userId) {
@@ -928,7 +919,7 @@ public class SpreadsheetsRepResource implements RestRepSpreadsheets {
 			public void process(WatchedEvent event) {
 				List<String> lst = zk.getChildren(path, this);
 				findPrimary(lst);
-				// getMostRecentVersion(lst)
+				getMostRecentVersion(lst);
 			}
 		});
 
@@ -1097,44 +1088,36 @@ public class SpreadsheetsRepResource implements RestRepSpreadsheets {
 	}
 
 	private void getMostRecentVersion(List<String> lst) {
-		class MostRecentVersion {
-			int version;
-			String url;
 
-			MostRecentVersion() {
-				this.version = 0;
-				this.url = "";
-			}
+		MostRecentVersion mostRecentVersion = new MostRecentVersion();
+		List<Thread> threads = new ArrayList<Thread>(lst.size());
+		lst.stream().forEach(e -> {
+			Thread thread = new Thread(() -> {
+				String currURI = zk.getValue(String.format("/%s/%s", domain, e));
+				int version = getReplicaCurrVersion(currURI);
+				mostRecentVersion.setHigherVersion(version, currURI);
+			});
+			threads.add(thread);
+			thread.start();
+		});
 
-			private int getVersion() {
-				return version;
-			}
-
-			private String getUrl() {
-				return url;
-			}
-
-			private void setVersion(int version) {
-				this.version = version;
-			}
-
-			private void setUrl(String url) {
-				this.url = url;
+		for(;;) {
+			boolean isRunning = false;
+			for (Thread thread : threads)
+				if (thread.isAlive())
+					isRunning = true;
+			if (!isRunning)
+				break;
+			try {
+				Thread.sleep(250);
+			} catch (Exception e) {
 			}
 		}
-		MostRecentVersion mostRecentVersion = new MostRecentVersion();
-		lst.stream().forEach(e -> {
-			String currURI = zk.getValue(String.format("/%s/%s", domain, e));
-			int version = getReplicaCurrVersion(currURI);
-			if (version > mostRecentVersion.getVersion()) {
-				mostRecentVersion.setUrl(currURI);
-				mostRecentVersion.setVersion(version);
-			}
-		});
 
 		if (!(mostRecentVersion.getUrl().equals(serverURI))) {
 			askForUpdate(mostRecentVersion.getUrl(), mostRecentVersion.getVersion());
 		}
+		
 	}
 
 	private int getReplicaCurrVersion(String replicaURI) {
