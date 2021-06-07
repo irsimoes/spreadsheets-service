@@ -33,6 +33,7 @@ import jakarta.xml.ws.BindingProvider;
 import jakarta.xml.ws.Service;
 import jakarta.xml.ws.WebServiceException;
 import tp1.api.Spreadsheet;
+import tp1.api.ValuesResult;
 import tp1.api.engine.AbstractSpreadsheet;
 import tp1.api.replies.GoogleSheetValuesReturn;
 import tp1.api.service.rest.RestUsers;
@@ -42,7 +43,6 @@ import tp1.api.service.soap.SoapUsers;
 import tp1.api.service.soap.UsersException;
 import tp1.discovery.Discovery;
 import tp1.impl.engine.SpreadsheetEngineImpl;
-import tp1.impl.servers.rest.ValuesResult;
 import tp1.util.CellRange;
 
 @WebService(serviceName = SoapSpreadsheets.NAME, targetNamespace = SoapSpreadsheets.NAMESPACE, endpointInterface = SoapSpreadsheets.INTERFACE)

@@ -1,4 +1,4 @@
-package tp1.impl.servers.rest;
+package tp1.api;
 
 import java.util.Set;
 

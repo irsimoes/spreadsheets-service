@@ -2,7 +2,7 @@ package tp1.api.service.soap;
 
 import jakarta.jws.WebService;
 import tp1.api.Spreadsheet;
-import tp1.impl.servers.rest.ValuesResult;
+import tp1.api.ValuesResult;
 
 @WebService(serviceName=SoapSpreadsheets.NAME, targetNamespace=SoapSpreadsheets.NAMESPACE, endpointInterface=SoapSpreadsheets.INTERFACE)
 public interface SoapSpreadsheets {

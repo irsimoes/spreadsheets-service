@@ -1,0 +1,564 @@
+Using default tag: latest
+latest: Pulling from nunopreguica/sd2021-tester-tp2
+Digest: sha256:7b135a983890aaf30fd078dce6764482594b9682c31709a547dd4b3d442dea9b
+Status: Image is up to date for nunopreguica/sd2021-tester-tp2:latest
+docker.io/nunopreguica/sd2021-tester-tp2:latest
+SD2021 +++ TP2 +++ Testing image: sd2021-tp1-55261-55584
+Version 06 - 31/05/2021
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+1a )	 Testing Docker environment [executing: docker info]
+---------------------------------------------------------------
+Docker ID: QUH7:MOWT:PN7C:WACK:XPNF:HT2H:AAO2:EENJ:FKX2:D55P:DUJU:V5N4
+OK                                                                                                                   
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+1b )	Testing: Docker engine CPU cores...
+---------------------------------------------------------------
+OK                                                                                                                   
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+1c )	Checking trabs.props [executing: docker run sd2021-tp1-55261-55584 /bin/cat trabs.props and nunopreguica/sd2021tpbase]
+---------------------------------------------------------------
+; Read properties from: ./trabs.props
+;	SHEETS_PROXY_SERVER_MAINCLASS=tp1.impl.servers.rest.DB.DBSpreadsheetsServer
+;	USERS_REST_SERVER_MAINCLASS=tp1.impl.servers.rest.UsersServer
+;	SHEETS_PROXY_EXTRA_ARGS=7jzo8e8rhdkaodh 7tl55e5tqgk79up 7py6vecj45v49h0 NQa3PgyCGNsAAAAAAAAAAd2ljMW4ja19x2TuglXPYbMSwfGhKJQT7DISKaIhzBmU AIzaSyAAFQLuz4rJSnLSrjOUmdX0DusvaE59bsg
+;	SHEETS_SOAP_PORT=8080
+;	CLIENT_TRUSTSTORE=truststore.ks
+;	USERS_REST_PORT=8080
+;	USERS_SERVER_KEYSTORE_PWD=password
+;	DISCOVERY_MULTICAST_PORT=2266
+;	SHEETS_PROXY_PORT=8080
+;	USERS_SOAP_SERVER_MAINCLASS=tp1.impl.servers.soap.UsersServer
+;	CLIENT_TRUSTSTORE_PWD=changeit
+;	SHEETS_REP_SERVER_MAINCLASS=tp1.impl.servers.rest.replication.SpreadsheetsRepServer
+;	SHEETS_REST_SERVER_MAINCLASS=tp1.impl.servers.rest.SpreadsheetsServer
+;	DISCOVERY_MULTICAST_IP=226.226.226.226
+;	SHEETS_REST_PORT=8080
+;	SHEETS_REP_EXTRA_ARGS_OTHER=7jzo8e8rhdkaodh AIzaSyAAFQLuz4rJSnLSrjOUmdX0DusvaE59bsg
+;	SHEETS_REP_EXTRA_ARGS_FIRST=7jzo8e8rhdkaodh AIzaSyAAFQLuz4rJSnLSrjOUmdX0DusvaE59bsg
+;	SHEETS_SOAP_SERVER_MAINCLASS=tp1.impl.servers.soap.SpreadsheetsServer
+;	SHEETS_SERVER_KEYSTORE=sheetserver.ks
+;	USERS_SERVER_KEYSTORE=userserver.ks
+;	SHEETS_REP_PORT=8080
+;	USERS_SOAP_PORT=8080
+;	SERVERS_EXTRA_ARGS=7jzo8e8rhdkaodh AIzaSyAAFQLuz4rJSnLSrjOUmdX0DusvaE59bsg
+;	SHEETS_SERVER_KEYSTORE_PWD=password
+OK                                                                                                                   
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+1d )	Checking TLS keys in client truststore
+---------------------------------------------------------------
+OK                                                                                                                   
+killByImage(sd2021-tp1-55261-55584): Removing container: [/angry_williams]
+killByImage(sd2021-tp1-55261-55584): Removing container: [/admiring_bhaskara]
+killByImage(sd2021-tp1-55261-55584): Removing container: [/vibrant_colden]
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+101a )	  Skipped...
+---------------------------------------------------------------
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+102a )	  Skipped...
+---------------------------------------------------------------
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+102b )	  Skipped...
+---------------------------------------------------------------
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+102c )	  Skipped...
+---------------------------------------------------------------
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+102d )	  Skipped...
+---------------------------------------------------------------
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+103a )	  Skipped...
+---------------------------------------------------------------
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+103b )	  Skipped...
+---------------------------------------------------------------
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+103c )	  Skipped...
+---------------------------------------------------------------
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+103d )	  Skipped...
+---------------------------------------------------------------
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+103e )	  Skipped...
+---------------------------------------------------------------
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+104a )	  Skipped...
+---------------------------------------------------------------
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+104b )	  Skipped...
+---------------------------------------------------------------
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+105a )	  Skipped...
+---------------------------------------------------------------
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+105b )	  Skipped...
+---------------------------------------------------------------
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+105c )	  Skipped...
+---------------------------------------------------------------
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+105d )	  Skipped...
+---------------------------------------------------------------
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+106a )	  Skipped...
+---------------------------------------------------------------
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+106b )	  Skipped...
+---------------------------------------------------------------
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+106c )	  Skipped...
+---------------------------------------------------------------
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+106d )	  Skipped...
+---------------------------------------------------------------
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+106e )	  Skipped...
+---------------------------------------------------------------
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+107a )	  Skipped...
+---------------------------------------------------------------
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+107b )	  Skipped...
+---------------------------------------------------------------
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+108a )	  Skipped...
+---------------------------------------------------------------
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+108b )	  Skipped...
+---------------------------------------------------------------
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+108c )	  Skipped...
+---------------------------------------------------------------
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+108d )	  Skipped...
+---------------------------------------------------------------
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+108e )	  Skipped...
+---------------------------------------------------------------
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+109a )	  Skipped...
+---------------------------------------------------------------
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+109b )	  Skipped...
+---------------------------------------------------------------
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+109c )	  Skipped...
+---------------------------------------------------------------
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+109d )	  Skipped...
+---------------------------------------------------------------
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+109e )	  Skipped...
+---------------------------------------------------------------
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+110a )	  Skipped...
+---------------------------------------------------------------
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+110b )	  Skipped...
+---------------------------------------------------------------
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+110c )	  Skipped...
+---------------------------------------------------------------
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+110d )	  Skipped...
+---------------------------------------------------------------
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+111a )	  Skipped...
+---------------------------------------------------------------
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+111b )	  Skipped...
+---------------------------------------------------------------
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+112a )	  Skipped...
+---------------------------------------------------------------
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+113a )	  Skipped...
+---------------------------------------------------------------
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+113b )	  Skipped...
+---------------------------------------------------------------
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+114a )	  Skipped...
+---------------------------------------------------------------
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+114b )	  Skipped...
+---------------------------------------------------------------
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+114c )	  Skipped...
+---------------------------------------------------------------
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+114d )	  Skipped...
+---------------------------------------------------------------
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+114e )	  Skipped...
+---------------------------------------------------------------
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+114f )	  Skipped...
+---------------------------------------------------------------
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+115a )	  Skipped...
+---------------------------------------------------------------
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+115b )	  Skipped...
+---------------------------------------------------------------
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+116a )	  Skipped...
+---------------------------------------------------------------
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+116b )	  Skipped...
+---------------------------------------------------------------
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+117a )	  Skipped...
+---------------------------------------------------------------
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+118a )	 Testing Mix Workload with Network faults for replica : 1 : [3] REST servers ; [] SOAP servers; [] PROXY servers
+---------------------------------------------------------------
+Starting external services
+INFO: Starting external services
+CMD: /usr/bin/docker run --rm --privileged -d --network=sdnet --name kafka -h kafka nunopreguica/sd2021-kafka
+Started: kafka : 
+007b4cfa900dbe335ad7b3b41b5bc6bd38054ac3693429ef1cc772572fae1d80
+sleeping: 9 s                                                                                sleeping: 8 s                                                                                sleeping: 7 s                                                                                sleeping: 6 s                                                                                sleeping: 5 s                                                                                sleeping: 4 s                                                                                sleeping: 3 s                                                                                sleeping: 2 s                                                                                sleeping: 1 s                                                                                sleeping: 0 s                                                                                                                                                                Starting REST services: Users : <1> replicas : mainClass = <tp1.impl.servers.rest.UsersServer> ; TLS : true
+INFO: Starting REST services: Users : <1> replicas : mainClass = <tp1.impl.servers.rest.UsersServer> ; TLS : true
+Starting REST services: Sheets : <3> replicas : mainClass = <tp1.impl.servers.rest.replication.SpreadsheetsRepServer> ; TLS : true
+INFO: Starting REST services: Sheets : <3> replicas : mainClass = <tp1.impl.servers.rest.replication.SpreadsheetsRepServer> ; TLS : true
+CMD: /usr/bin/docker run --rm --privileged -d --network=sdnet --name users.domain-1 -h users.domain-1 sd2021-tp1-55261-55584 java -Djavax.net.ssl.keyStore=/home/sd/userserver.ks -Djavax.net.ssl.keyStorePassword=password -Djavax.net.ssl.trustStore=/home/sd/truststore.ks -Djavax.net.ssl.trustStorePassword=changeit -cp /home/sd/sd2021.jar tp1.impl.servers.rest.UsersServer domain-1 7jzo8e8rhdkaodh AIzaSyAAFQLuz4rJSnLSrjOUmdX0DusvaE59bsg
+Started: users.domain-1 : java -Djavax.net.ssl.keyStore=/home/sd/userserver.ks -Djavax.net.ssl.keyStorePassword=password -Djavax.net.ssl.trustStore=/home/sd/truststore.ks -Djavax.net.ssl.trustStorePassword=changeit -cp /home/sd/sd2021.jar tp1.impl.servers.rest.UsersServer domain-1 7jzo8e8rhdkaodh AIzaSyAAFQLuz4rJSnLSrjOUmdX0DusvaE59bsg
+a338c4372d463ccadea246445473683f24f2cf50c38cc6dd163bfb85bab20386
+CMD: /usr/bin/docker run --rm --privileged -d --network=sdnet --name sheets.domain-1 -h sheets.domain-1 sd2021-tp1-55261-55584 java -Djavax.net.ssl.keyStore=/home/sd/sheetserver.ks -Djavax.net.ssl.keyStorePassword=password -Djavax.net.ssl.trustStore=/home/sd/truststore.ks -Djavax.net.ssl.trustStorePassword=changeit -cp /home/sd/sd2021.jar tp1.impl.servers.rest.replication.SpreadsheetsRepServer domain-1 7jzo8e8rhdkaodh AIzaSyAAFQLuz4rJSnLSrjOUmdX0DusvaE59bsg
+Started: sheets.domain-1 : java -Djavax.net.ssl.keyStore=/home/sd/sheetserver.ks -Djavax.net.ssl.keyStorePassword=password -Djavax.net.ssl.trustStore=/home/sd/truststore.ks -Djavax.net.ssl.trustStorePassword=changeit -cp /home/sd/sd2021.jar tp1.impl.servers.rest.replication.SpreadsheetsRepServer domain-1 7jzo8e8rhdkaodh AIzaSyAAFQLuz4rJSnLSrjOUmdX0DusvaE59bsg
+72e4f0232b4cd310e21ba0832fa11ed79902260ba568d3edd93fd95e1ee62cdb
+sleeping: 2 s                                                                                sleeping: 1 s                                                                                sleeping: 0 s                                                                                                                                                                CMD: /usr/bin/docker run --rm --privileged -d --network=sdnet --name sheets2.domain-1 -h sheets2.domain-1 sd2021-tp1-55261-55584 java -Djavax.net.ssl.keyStore=/home/sd/sheetserver.ks -Djavax.net.ssl.keyStorePassword=password -Djavax.net.ssl.trustStore=/home/sd/truststore.ks -Djavax.net.ssl.trustStorePassword=changeit -cp /home/sd/sd2021.jar tp1.impl.servers.rest.replication.SpreadsheetsRepServer domain-1 7jzo8e8rhdkaodh AIzaSyAAFQLuz4rJSnLSrjOUmdX0DusvaE59bsg
+Started: sheets2.domain-1 : java -Djavax.net.ssl.keyStore=/home/sd/sheetserver.ks -Djavax.net.ssl.keyStorePassword=password -Djavax.net.ssl.trustStore=/home/sd/truststore.ks -Djavax.net.ssl.trustStorePassword=changeit -cp /home/sd/sd2021.jar tp1.impl.servers.rest.replication.SpreadsheetsRepServer domain-1 7jzo8e8rhdkaodh AIzaSyAAFQLuz4rJSnLSrjOUmdX0DusvaE59bsg
+3fefc12d4b15741ae02cc0c8784a752449508ca4d7d10111a53402f60266cd2c
+CMD: /usr/bin/docker run --rm --privileged -d --network=sdnet --name sheets3.domain-1 -h sheets3.domain-1 sd2021-tp1-55261-55584 java -Djavax.net.ssl.keyStore=/home/sd/sheetserver.ks -Djavax.net.ssl.keyStorePassword=password -Djavax.net.ssl.trustStore=/home/sd/truststore.ks -Djavax.net.ssl.trustStorePassword=changeit -cp /home/sd/sd2021.jar tp1.impl.servers.rest.replication.SpreadsheetsRepServer domain-1 7jzo8e8rhdkaodh AIzaSyAAFQLuz4rJSnLSrjOUmdX0DusvaE59bsg
+Started: sheets3.domain-1 : java -Djavax.net.ssl.keyStore=/home/sd/sheetserver.ks -Djavax.net.ssl.keyStorePassword=password -Djavax.net.ssl.trustStore=/home/sd/truststore.ks -Djavax.net.ssl.trustStorePassword=changeit -cp /home/sd/sd2021.jar tp1.impl.servers.rest.replication.SpreadsheetsRepServer domain-1 7jzo8e8rhdkaodh AIzaSyAAFQLuz4rJSnLSrjOUmdX0DusvaE59bsg
+a10c159bccb604b68a59bb7f44029e998cf193129a8f5643da45141aecd8612b
+sleeping: 2 s                                                                                sleeping: 1 s                                                                                sleeping: 0 s                                                                                                                                                                ---------- Creating 10 users
+1/10                                                                                [PostUser https://172.20.0.4:8080/rest] User [email=jackie.rau@domain-1, userId=jackie.rau, fullName=Sergio Cartwright, password=pcfr3k96] -> 200:jackie.rau
+2/10                                                                                [PostUser https://172.20.0.4:8080/rest] User [email=gregory.wiza@domain-1, userId=gregory.wiza, fullName=Cynthia Jenkins, password=i2p8a933fl] -> 200:gregory.wiza
+3/10                                                                                [PostUser https://172.20.0.4:8080/rest] User [email=terence.bartoletti@domain-1, userId=terence.bartoletti, fullName=Duncan Rau, password=9ckdkq2g5v64p] -> 200:terence.bartoletti
+4/10                                                                                [PostUser https://172.20.0.4:8080/rest] User [email=dillon.bayer@domain-1, userId=dillon.bayer, fullName=Miyoko Hayes, password=gm7h08scerl0y] -> 200:dillon.bayer
+5/10                                                                                [PostUser https://172.20.0.4:8080/rest] User [email=digna.hilll@domain-1, userId=digna.hilll, fullName=Burl Schaden, password=jazhvzdqm4u5] -> 200:digna.hilll
+6/10                                                                                [PostUser https://172.20.0.4:8080/rest] User [email=lemuel.spencer@domain-1, userId=lemuel.spencer, fullName=Christinia Graham, password=d5p7a5w3kzb] -> 200:lemuel.spencer
+7/10                                                                                [PostUser https://172.20.0.4:8080/rest] User [email=blake.gottlieb@domain-1, userId=blake.gottlieb, fullName=Mrs. Vance Trantow, password=w6eoe4afjfbwrow] -> 200:blake.gottlieb
+8/10                                                                                [PostUser https://172.20.0.4:8080/rest] User [email=refugio.bergstrom@domain-1, userId=refugio.bergstrom, fullName=Derrick Leannon, password=x938brfo] -> 200:refugio.bergstrom
+9/10                                                                                [PostUser https://172.20.0.4:8080/rest] User [email=timmy.mohr@domain-1, userId=timmy.mohr, fullName=Chantel Crist, password=fl93wf84e0jhb1] -> 200:timmy.mohr
+10/10                                                                                [PostUser https://172.20.0.4:8080/rest] User [email=mervin.hahn@domain-1, userId=mervin.hahn, fullName=Collen Spencer, password=xzuuby5zxz0ikg] -> 200:mervin.hahn
+sleeping: 2 s                                                                                sleeping: 1 s                                                                                sleeping: 0 s                                                                                                                                                                ---------- Creating 10 sheets
+1/10                                                                                [CreateSpreadsheet https://172.20.0.5:8080/rest] password = d5p7a5w3kzb ; sheet = sheetId = null ; sheetURL= null ; owner = lemuel.spencer ; dim = 23x11 ; sharedWith = [] ; values = [[,Sao Tome and Principe,Kuwait,Turkey,Brazil,Haiti,Seychelles,Portugal,Singapore,Andorra,Brazil][01-57-2020,13,54,4,34,6,78,48,,,][02-57-2020,69,73,17,63,62,34,92,,,][03-57-2020,62,96,89,76,32,10,99,,,][04-57-2020,74,59,98,53,37,2,5,,,][05-57-2020,54,0,6,63,55,89,20,,,][06-57-2020,75,34,15,60,77,37,77,,,][07-57-2020,92,20,88,0,57,52,33,,,][08-57-2020,76,55,36,45,58,29,4,,,][09-57-2020,84,0,51,86,83,98,96,,,][10-57-2020,8,14,65,28,59,16,15,,,][11-57-2020,58,22,87,92,31,1,97,,,][12-57-2020,88,62,41,8,85,69,79,,,][13-57-2020,95,59,10,17,26,74,20,,,][14-57-2020,53,25,1,1,36,50,74,,,][15-57-2020,32,94,75,94,24,8,43,,,][16-57-2020,3,47,67,80,51,33,57,,,][17-57-2020,66,77,45,50,69,8,3,,,][18-57-2020,90,76,16,96,21,99,34,,,][19-57-2020,19,28,71,50,5,95,56,,,][20-57-2020,64,91,16,36,88,28,11,,,][21-57-2020,62,63,90,79,95,92,63,,,][,,,,,,,,,,]] -> 200:e7abf801-30d8-4715-b10d-440f1467a669
+2/10                                                                                [CreateSpreadsheet https://172.20.0.5:8080/rest] password = jazhvzdqm4u5 ; sheet = sheetId = null ; sheetURL= null ; owner = digna.hilll ; dim = 22x13 ; sharedWith = [] ; values = [[,Guam,Morocco,Zambia,Mayotte,Western Sahara,Moldova,Palestinian Territory,Kenya,Djibouti,Ethiopia,Norway,Brazil][01-57-2020,97,1,75,57,64,7,57,49,56,,,][02-57-2020,57,49,83,46,91,46,88,35,77,,,][03-57-2020,8,42,35,96,70,70,29,95,8,,,][04-57-2020,40,40,35,6,98,87,28,9,2,,,][05-57-2020,99,91,60,38,33,5,32,81,15,,,][06-57-2020,9,66,96,7,83,38,2,67,32,,,][07-57-2020,17,18,45,94,91,36,79,68,98,,,][08-57-2020,83,63,74,0,54,89,69,72,40,,,][09-57-2020,58,50,76,31,68,66,75,50,20,,,][10-57-2020,46,19,39,8,24,86,41,39,78,,,][11-57-2020,69,97,48,58,62,76,47,39,11,,,][12-57-2020,9,98,48,84,61,2,99,25,65,,,][13-57-2020,34,66,70,51,15,98,17,86,99,,,][14-57-2020,3,42,20,51,53,10,5,3,92,,,][15-57-2020,29,6,53,68,21,8,3,85,29,,,][16-57-2020,36,58,41,8,64,28,36,71,76,,,][17-57-2020,89,63,81,94,10,95,4,67,5,,,][18-57-2020,21,70,44,13,95,24,29,33,63,,,][19-57-2020,8,6,66,23,6,16,78,98,31,,,][20-57-2020,63,3,69,89,59,49,2,27,63,,,][,,,,,,,,,,,,]] -> 200:5d492171-9e35-46d8-9d13-f11184e6e94c
+3/10                                                                                [CreateSpreadsheet https://172.20.0.5:8080/rest] password = xzuuby5zxz0ikg ; sheet = sheetId = null ; sheetURL= null ; owner = mervin.hahn ; dim = 24x13 ; sharedWith = [] ; values = [[,Jersey,Luxembourg,Nauru,Micronesia,Lesotho,Estonia,Niue,Bosnia and Herzegovina,Anguilla,Qatar,Egypt,Afghanistan][01-57-2020,66,52,20,94,5,77,23,98,10,,,][02-57-2020,49,86,14,68,62,3,67,63,70,,,][03-57-2020,99,99,55,97,9,84,65,73,57,,,][04-57-2020,11,62,82,68,25,5,69,69,0,,,][05-57-2020,56,75,32,72,15,27,87,81,21,,,][06-57-2020,56,53,94,79,6,49,68,47,28,,,][07-57-2020,47,13,34,7,74,69,10,89,54,,,][08-57-2020,23,4,36,33,73,29,40,61,73,,,][09-57-2020,8,4,8,24,77,50,25,40,73,,,][10-57-2020,89,11,83,51,59,4,48,93,61,,,][11-57-2020,40,54,56,94,12,23,78,49,14,,,][12-57-2020,94,45,55,75,78,43,84,8,63,,,][13-57-2020,73,87,18,28,9,97,53,46,36,,,][14-57-2020,75,20,0,24,47,67,44,31,12,,,][15-57-2020,41,14,17,0,22,5,24,36,9,,,][16-57-2020,90,95,51,80,17,76,11,69,40,,,][17-57-2020,83,68,43,71,25,94,94,65,50,,,][18-57-2020,63,28,28,71,84,18,4,83,72,,,][19-57-2020,47,55,89,87,44,38,75,92,26,,,][20-57-2020,72,7,91,41,80,87,18,65,24,,,][21-57-2020,34,6,67,16,30,59,9,38,77,,,][22-57-2020,81,59,20,26,90,19,49,84,93,,,][,,,,,,,,,,,,]] -> 200:c22891fc-1e09-4222-83d4-e3fa01f36ef3
+4/10                                                                                [CreateSpreadsheet https://172.20.0.5:8080/rest] password = w6eoe4afjfbwrow ; sheet = sheetId = null ; sheetURL= null ; owner = blake.gottlieb ; dim = 24x12 ; sharedWith = [] ; values = [[,French Guiana,Poland,Belize,Iran,Mauritania,Jordan,Montenegro,Greece,Marshall Islands,Tunisia,Estonia][01-57-2020,65,39,83,25,50,63,33,45,,,][02-57-2020,9,32,83,16,31,59,69,30,,,][03-57-2020,21,28,99,56,3,27,75,28,,,][04-57-2020,62,37,69,66,77,9,52,95,,,][05-57-2020,44,76,46,90,8,51,18,53,,,][06-57-2020,87,18,46,95,83,9,51,84,,,][07-57-2020,74,67,49,41,30,36,48,50,,,][08-57-2020,16,57,33,30,43,6,43,91,,,][09-57-2020,41,88,57,75,85,84,24,71,,,][10-57-2020,25,37,63,54,60,2,91,93,,,][11-57-2020,45,24,78,23,26,55,80,72,,,][12-57-2020,4,76,52,16,8,47,25,71,,,][13-57-2020,70,59,88,19,58,63,67,22,,,][14-57-2020,39,48,12,73,89,9,52,81,,,][15-57-2020,65,70,60,94,68,67,50,26,,,][16-57-2020,93,48,17,81,86,14,74,76,,,][17-57-2020,33,89,87,15,30,20,26,64,,,][18-57-2020,1,47,39,8,3,24,47,45,,,][19-57-2020,57,38,25,39,43,46,47,76,,,][20-57-2020,60,23,70,53,79,13,71,6,,,][21-57-2020,39,38,26,46,65,14,77,95,,,][22-57-2020,38,86,46,24,9,80,99,47,,,][,,,,,,,,,,,]] -> 200:c150e9c8-9a72-4286-a99e-8a797d74499a
+5/10                                                                                [CreateSpreadsheet https://172.20.0.5:8080/rest] password = fl93wf84e0jhb1 ; sheet = sheetId = null ; sheetURL= null ; owner = timmy.mohr ; dim = 20x12 ; sharedWith = [] ; values = [[,Saint Kitts and Nevis,Comoros,Saint Lucia,Burkina Faso,Algeria,Russian Federation,Fiji,Madagascar,Peru,Lesotho,Mauritius][01-57-2020,73,40,76,30,94,85,56,65,,,][02-57-2020,70,75,85,12,29,60,11,93,,,][03-57-2020,68,20,78,29,84,68,50,11,,,][04-57-2020,13,99,12,25,3,92,96,76,,,][05-57-2020,53,77,35,92,76,55,27,32,,,][06-57-2020,30,84,13,44,29,12,54,92,,,][07-57-2020,66,49,8,70,99,73,69,93,,,][08-57-2020,34,61,6,16,91,50,38,18,,,][09-57-2020,26,88,73,0,5,92,4,38,,,][10-57-2020,33,8,38,27,61,19,5,99,,,][11-57-2020,19,63,31,59,52,57,29,44,,,][12-57-2020,23,7,3,49,14,70,14,19,,,][13-57-2020,84,49,18,95,59,70,47,83,,,][14-57-2020,50,70,4,19,59,64,91,58,,,][15-57-2020,56,39,92,33,31,2,49,51,,,][16-57-2020,29,22,71,32,39,82,31,61,,,][17-57-2020,80,50,52,64,16,90,20,2,,,][18-57-2020,41,95,46,73,82,12,72,85,,,][,,,,,,,,,,,]] -> 200:5bb5303d-9c4a-4626-bce2-a9f3bd009e26
+6/10                                                                                [CreateSpreadsheet https://172.20.0.5:8080/rest] password = w6eoe4afjfbwrow ; sheet = sheetId = null ; sheetURL= null ; owner = blake.gottlieb ; dim = 23x12 ; sharedWith = [] ; values = [[,Mali,France,Oman,Dominican Republic,Mayotte,Botswana,Taiwan,Haiti,Netherlands,Oman,South Africa][01-57-2020,67,76,46,5,72,63,21,85,,,][02-57-2020,96,96,75,37,46,98,81,37,,,][03-57-2020,32,54,48,40,61,99,98,49,,,][04-57-2020,83,81,23,12,77,91,18,23,,,][05-57-2020,82,63,63,29,66,89,29,62,,,][06-57-2020,53,27,72,13,37,16,81,53,,,][07-57-2020,59,31,59,22,91,79,71,77,,,][08-57-2020,33,97,88,16,72,6,32,85,,,][09-57-2020,61,96,26,49,65,68,28,33,,,][10-57-2020,72,22,3,1,2,84,26,29,,,][11-57-2020,72,88,69,22,24,70,74,37,,,][12-57-2020,15,83,61,58,51,73,25,9,,,][13-57-2020,33,63,98,54,17,87,12,75,,,][14-57-2020,53,47,22,95,84,54,81,97,,,][15-57-2020,99,69,96,84,80,95,84,90,,,][16-57-2020,95,41,48,28,58,6,86,86,,,][17-57-2020,29,79,82,54,70,55,13,92,,,][18-57-2020,71,47,10,45,69,9,61,37,,,][19-57-2020,30,54,25,72,31,42,36,4,,,][20-57-2020,84,8,58,9,2,47,30,9,,,][21-57-2020,90,25,85,63,36,75,93,87,,,][,,,,,,,,,,,]] -> 200:e1f47b80-b471-4d7e-a974-4e58b882c817
+7/10                                                                                [CreateSpreadsheet https://172.20.0.5:8080/rest] password = w6eoe4afjfbwrow ; sheet = sheetId = null ; sheetURL= null ; owner = blake.gottlieb ; dim = 24x13 ; sharedWith = [] ; values = [[,Venezuela,Mauritania,Seychelles,South Georgia and the South Sandwich Islands,Oman,Indonesia,Saudi Arabia,Kazakhstan,Sierra Leone,Denmark,Antigua and Barbuda,Guadeloupe][01-57-2020,69,92,5,46,32,46,27,11,98,,,][02-57-2020,85,56,34,6,80,92,55,81,37,,,][03-57-2020,0,38,93,83,90,88,24,87,87,,,][04-57-2020,46,94,16,8,93,50,29,11,29,,,][05-57-2020,83,49,92,24,15,90,16,54,37,,,][06-57-2020,99,61,18,52,8,68,96,0,1,,,][07-57-2020,24,91,61,35,88,83,42,98,53,,,][08-57-2020,27,17,80,42,69,74,87,85,34,,,][09-57-2020,73,58,67,93,68,74,79,12,75,,,][10-57-2020,44,79,54,92,64,60,5,22,48,,,][11-57-2020,70,0,2,90,85,50,76,37,30,,,][12-57-2020,2,0,71,25,34,10,13,12,46,,,][13-57-2020,77,8,89,57,20,3,50,39,45,,,][14-57-2020,10,14,28,48,94,71,6,40,4,,,][15-57-2020,75,54,29,56,8,64,86,26,74,,,][16-57-2020,16,5,7,11,61,90,42,73,61,,,][17-57-2020,57,63,48,72,88,62,82,6,81,,,][18-57-2020,65,33,20,57,63,65,47,22,45,,,][19-57-2020,32,12,31,95,70,23,50,0,97,,,][20-57-2020,63,31,0,18,52,33,34,42,12,,,][21-57-2020,45,34,0,32,7,53,44,26,52,,,][22-57-2020,72,97,21,53,16,76,92,48,31,,,][,,,,,,,,,,,,]] -> 200:f7a88c89-6726-4d56-81cc-d1243574a425
+8/10                                                                                [CreateSpreadsheet https://172.20.0.5:8080/rest] password = gm7h08scerl0y ; sheet = sheetId = null ; sheetURL= null ; owner = dillon.bayer ; dim = 24x10 ; sharedWith = [] ; values = [[,Jordan,Cape Verde,El Salvador,Virgin Islands, U.S.,Swaziland,Georgia,Brazil,Haiti,Wallis and Futuna][01-57-2020,72,89,15,49,45,27,,,][02-57-2020,77,99,38,87,35,72,,,][03-57-2020,99,8,46,77,30,71,,,][04-57-2020,13,6,39,37,59,49,,,][05-57-2020,5,63,91,49,29,99,,,][06-57-2020,72,31,7,96,61,16,,,][07-57-2020,82,97,42,62,37,15,,,][08-57-2020,93,28,56,74,43,15,,,][09-57-2020,36,62,43,43,78,87,,,][10-57-2020,54,43,96,78,10,58,,,][11-57-2020,2,47,13,35,22,33,,,][12-57-2020,37,52,10,33,81,47,,,][13-57-2020,9,55,79,98,13,17,,,][14-57-2020,9,13,84,34,90,62,,,][15-57-2020,8,28,42,1,25,91,,,][16-57-2020,59,62,58,23,79,72,,,][17-57-2020,7,0,20,88,65,69,,,][18-57-2020,2,55,29,2,91,61,,,][19-57-2020,16,55,6,55,64,58,,,][20-57-2020,90,0,63,12,10,16,,,][21-57-2020,32,85,25,26,0,63,,,][22-57-2020,16,32,47,22,41,9,,,][,,,,,,,,,]] -> 200:c805cfad-13e0-407e-96d9-068fcc5bdee6
+9/10                                                                                [CreateSpreadsheet https://172.20.0.5:8080/rest] password = x938brfo ; sheet = sheetId = null ; sheetURL= null ; owner = refugio.bergstrom ; dim = 21x12 ; sharedWith = [] ; values = [[,Jersey,Cook Islands,Iraq,Saint Vincent and the Grenadines,Puerto Rico,Benin,Somalia,Falkland Islands (Malvinas),Guernsey,Yemen,Somalia][01-57-2020,55,48,76,12,38,74,86,66,,,][02-57-2020,74,57,91,41,13,71,75,68,,,][03-57-2020,61,41,41,52,61,36,87,66,,,][04-57-2020,10,42,50,48,54,59,88,38,,,][05-57-2020,66,40,18,7,93,73,51,27,,,][06-57-2020,1,3,16,9,84,97,65,46,,,][07-57-2020,27,40,74,65,0,79,15,18,,,][08-57-2020,15,81,69,30,69,54,75,88,,,][09-57-2020,68,72,36,14,30,97,35,36,,,][10-57-2020,83,99,13,46,54,25,30,9,,,][11-57-2020,50,94,65,87,71,29,66,52,,,][12-57-2020,97,46,66,69,39,35,14,17,,,][13-57-2020,49,47,77,16,24,42,32,56,,,][14-57-2020,6,11,99,78,83,30,74,81,,,][15-57-2020,18,49,69,58,90,5,54,48,,,][16-57-2020,74,78,65,36,19,85,63,9,,,][17-57-2020,97,99,21,93,51,18,71,64,,,][18-57-2020,77,49,41,15,22,44,60,53,,,][19-57-2020,43,78,98,2,48,19,85,77,,,][,,,,,,,,,,,]] -> 200:acb25c6f-40c3-403d-b82d-0568ac4fff53
+10/10                                                                                [CreateSpreadsheet https://172.20.0.5:8080/rest] password = fl93wf84e0jhb1 ; sheet = sheetId = null ; sheetURL= null ; owner = timmy.mohr ; dim = 20x12 ; sharedWith = [] ; values = [[,Russian Federation,Bosnia and Herzegovina,Guatemala,Burundi,Australia,Austria,New Zealand,Australia,France,Niue,Poland][01-57-2020,44,23,97,5,35,72,75,24,,,][02-57-2020,14,17,12,0,64,13,95,95,,,][03-57-2020,56,36,36,62,51,50,62,89,,,][04-57-2020,80,57,48,41,56,21,60,40,,,][05-57-2020,59,44,18,11,68,3,39,99,,,][06-57-2020,66,4,98,11,67,92,42,10,,,][07-57-2020,89,9,2,34,69,13,7,49,,,][08-57-2020,11,59,32,56,1,20,82,2,,,][09-57-2020,44,21,22,82,40,48,51,42,,,][10-57-2020,57,5,8,99,38,12,43,70,,,][11-57-2020,31,20,77,86,36,86,62,67,,,][12-57-2020,59,76,30,55,20,5,6,27,,,][13-57-2020,35,63,61,71,63,57,79,92,,,][14-57-2020,23,3,15,50,42,59,53,86,,,][15-57-2020,53,10,34,88,31,64,68,38,,,][16-57-2020,9,77,67,10,68,45,70,31,,,][17-57-2020,0,54,96,12,61,49,87,49,,,][18-57-2020,93,27,2,66,8,31,7,34,,,][,,,,,,,,,,,]] -> 200:a5bb535b-84d7-4716-8e02-1ca52fd3dc41
+sleeping: 2 s                                                                                sleeping: 1 s                                                                                sleeping: 0 s                                                                                                                                                                ---------- Getting 10 sheets
+[GetSpreadsheet https://172.20.0.5:8080/rest] sheetId = e7abf801-30d8-4715-b10d-440f1467a669, userId = lemuel.spencer, pwd = d5p7a5w3kzb -> 200:sheetId = e7abf801-30d8-4715-b10d-440f1467a669 ; sheetURL= https://172.20.0.5:8080/rest/spreadsheets/e7abf801-30d8-4715-b10d-440f1467a669 ; owner = lemuel.spencer ; dim = 23x11 ; sharedWith = [] ; values = [[,Sao Tome and Principe,Kuwait,Turkey,Brazil,Haiti,Seychelles,Portugal,Singapore,Andorra,Brazil][01-57-2020,13,54,4,34,6,78,48,,,][02-57-2020,69,73,17,63,62,34,92,,,][03-57-2020,62,96,89,76,32,10,99,,,][04-57-2020,74,59,98,53,37,2,5,,,][05-57-2020,54,0,6,63,55,89,20,,,][06-57-2020,75,34,15,60,77,37,77,,,][07-57-2020,92,20,88,0,57,52,33,,,][08-57-2020,76,55,36,45,58,29,4,,,][09-57-2020,84,0,51,86,83,98,96,,,][10-57-2020,8,14,65,28,59,16,15,,,][11-57-2020,58,22,87,92,31,1,97,,,][12-57-2020,88,62,41,8,85,69,79,,,][13-57-2020,95,59,10,17,26,74,20,,,][14-57-2020,53,25,1,1,36,50,74,,,][15-57-2020,32,94,75,94,24,8,43,,,][16-57-2020,3,47,67,80,51,33,57,,,][17-57-2020,66,77,45,50,69,8,3,,,][18-57-2020,90,76,16,96,21,99,34,,,][19-57-2020,19,28,71,50,5,95,56,,,][20-57-2020,64,91,16,36,88,28,11,,,][21-57-2020,62,63,90,79,95,92,63,,,][,,,,,,,,,,]]
+[GetSpreadsheet https://172.20.0.5:8080/rest] sheetId = 5d492171-9e35-46d8-9d13-f11184e6e94c, userId = digna.hilll, pwd = jazhvzdqm4u5 -> 200:sheetId = 5d492171-9e35-46d8-9d13-f11184e6e94c ; sheetURL= https://172.20.0.5:8080/rest/spreadsheets/5d492171-9e35-46d8-9d13-f11184e6e94c ; owner = digna.hilll ; dim = 22x13 ; sharedWith = [] ; values = [[,Guam,Morocco,Zambia,Mayotte,Western Sahara,Moldova,Palestinian Territory,Kenya,Djibouti,Ethiopia,Norway,Brazil][01-57-2020,97,1,75,57,64,7,57,49,56,,,][02-57-2020,57,49,83,46,91,46,88,35,77,,,][03-57-2020,8,42,35,96,70,70,29,95,8,,,][04-57-2020,40,40,35,6,98,87,28,9,2,,,][05-57-2020,99,91,60,38,33,5,32,81,15,,,][06-57-2020,9,66,96,7,83,38,2,67,32,,,][07-57-2020,17,18,45,94,91,36,79,68,98,,,][08-57-2020,83,63,74,0,54,89,69,72,40,,,][09-57-2020,58,50,76,31,68,66,75,50,20,,,][10-57-2020,46,19,39,8,24,86,41,39,78,,,][11-57-2020,69,97,48,58,62,76,47,39,11,,,][12-57-2020,9,98,48,84,61,2,99,25,65,,,][13-57-2020,34,66,70,51,15,98,17,86,99,,,][14-57-2020,3,42,20,51,53,10,5,3,92,,,][15-57-2020,29,6,53,68,21,8,3,85,29,,,][16-57-2020,36,58,41,8,64,28,36,71,76,,,][17-57-2020,89,63,81,94,10,95,4,67,5,,,][18-57-2020,21,70,44,13,95,24,29,33,63,,,][19-57-2020,8,6,66,23,6,16,78,98,31,,,][20-57-2020,63,3,69,89,59,49,2,27,63,,,][,,,,,,,,,,,,]]
+[GetSpreadsheet https://172.20.0.5:8080/rest] sheetId = c22891fc-1e09-4222-83d4-e3fa01f36ef3, userId = mervin.hahn, pwd = xzuuby5zxz0ikg -> 200:sheetId = c22891fc-1e09-4222-83d4-e3fa01f36ef3 ; sheetURL= https://172.20.0.5:8080/rest/spreadsheets/c22891fc-1e09-4222-83d4-e3fa01f36ef3 ; owner = mervin.hahn ; dim = 24x13 ; sharedWith = [] ; values = [[,Jersey,Luxembourg,Nauru,Micronesia,Lesotho,Estonia,Niue,Bosnia and Herzegovina,Anguilla,Qatar,Egypt,Afghanistan][01-57-2020,66,52,20,94,5,77,23,98,10,,,][02-57-2020,49,86,14,68,62,3,67,63,70,,,][03-57-2020,99,99,55,97,9,84,65,73,57,,,][04-57-2020,11,62,82,68,25,5,69,69,0,,,][05-57-2020,56,75,32,72,15,27,87,81,21,,,][06-57-2020,56,53,94,79,6,49,68,47,28,,,][07-57-2020,47,13,34,7,74,69,10,89,54,,,][08-57-2020,23,4,36,33,73,29,40,61,73,,,][09-57-2020,8,4,8,24,77,50,25,40,73,,,][10-57-2020,89,11,83,51,59,4,48,93,61,,,][11-57-2020,40,54,56,94,12,23,78,49,14,,,][12-57-2020,94,45,55,75,78,43,84,8,63,,,][13-57-2020,73,87,18,28,9,97,53,46,36,,,][14-57-2020,75,20,0,24,47,67,44,31,12,,,][15-57-2020,41,14,17,0,22,5,24,36,9,,,][16-57-2020,90,95,51,80,17,76,11,69,40,,,][17-57-2020,83,68,43,71,25,94,94,65,50,,,][18-57-2020,63,28,28,71,84,18,4,83,72,,,][19-57-2020,47,55,89,87,44,38,75,92,26,,,][20-57-2020,72,7,91,41,80,87,18,65,24,,,][21-57-2020,34,6,67,16,30,59,9,38,77,,,][22-57-2020,81,59,20,26,90,19,49,84,93,,,][,,,,,,,,,,,,]]
+[GetSpreadsheet https://172.20.0.5:8080/rest] sheetId = c150e9c8-9a72-4286-a99e-8a797d74499a, userId = blake.gottlieb, pwd = w6eoe4afjfbwrow -> 200:sheetId = c150e9c8-9a72-4286-a99e-8a797d74499a ; sheetURL= https://172.20.0.5:8080/rest/spreadsheets/c150e9c8-9a72-4286-a99e-8a797d74499a ; owner = blake.gottlieb ; dim = 24x12 ; sharedWith = [] ; values = [[,French Guiana,Poland,Belize,Iran,Mauritania,Jordan,Montenegro,Greece,Marshall Islands,Tunisia,Estonia][01-57-2020,65,39,83,25,50,63,33,45,,,][02-57-2020,9,32,83,16,31,59,69,30,,,][03-57-2020,21,28,99,56,3,27,75,28,,,][04-57-2020,62,37,69,66,77,9,52,95,,,][05-57-2020,44,76,46,90,8,51,18,53,,,][06-57-2020,87,18,46,95,83,9,51,84,,,][07-57-2020,74,67,49,41,30,36,48,50,,,][08-57-2020,16,57,33,30,43,6,43,91,,,][09-57-2020,41,88,57,75,85,84,24,71,,,][10-57-2020,25,37,63,54,60,2,91,93,,,][11-57-2020,45,24,78,23,26,55,80,72,,,][12-57-2020,4,76,52,16,8,47,25,71,,,][13-57-2020,70,59,88,19,58,63,67,22,,,][14-57-2020,39,48,12,73,89,9,52,81,,,][15-57-2020,65,70,60,94,68,67,50,26,,,][16-57-2020,93,48,17,81,86,14,74,76,,,][17-57-2020,33,89,87,15,30,20,26,64,,,][18-57-2020,1,47,39,8,3,24,47,45,,,][19-57-2020,57,38,25,39,43,46,47,76,,,][20-57-2020,60,23,70,53,79,13,71,6,,,][21-57-2020,39,38,26,46,65,14,77,95,,,][22-57-2020,38,86,46,24,9,80,99,47,,,][,,,,,,,,,,,]]
+[GetSpreadsheet https://172.20.0.5:8080/rest] sheetId = 5bb5303d-9c4a-4626-bce2-a9f3bd009e26, userId = timmy.mohr, pwd = fl93wf84e0jhb1 -> 200:sheetId = 5bb5303d-9c4a-4626-bce2-a9f3bd009e26 ; sheetURL= https://172.20.0.5:8080/rest/spreadsheets/5bb5303d-9c4a-4626-bce2-a9f3bd009e26 ; owner = timmy.mohr ; dim = 20x12 ; sharedWith = [] ; values = [[,Saint Kitts and Nevis,Comoros,Saint Lucia,Burkina Faso,Algeria,Russian Federation,Fiji,Madagascar,Peru,Lesotho,Mauritius][01-57-2020,73,40,76,30,94,85,56,65,,,][02-57-2020,70,75,85,12,29,60,11,93,,,][03-57-2020,68,20,78,29,84,68,50,11,,,][04-57-2020,13,99,12,25,3,92,96,76,,,][05-57-2020,53,77,35,92,76,55,27,32,,,][06-57-2020,30,84,13,44,29,12,54,92,,,][07-57-2020,66,49,8,70,99,73,69,93,,,][08-57-2020,34,61,6,16,91,50,38,18,,,][09-57-2020,26,88,73,0,5,92,4,38,,,][10-57-2020,33,8,38,27,61,19,5,99,,,][11-57-2020,19,63,31,59,52,57,29,44,,,][12-57-2020,23,7,3,49,14,70,14,19,,,][13-57-2020,84,49,18,95,59,70,47,83,,,][14-57-2020,50,70,4,19,59,64,91,58,,,][15-57-2020,56,39,92,33,31,2,49,51,,,][16-57-2020,29,22,71,32,39,82,31,61,,,][17-57-2020,80,50,52,64,16,90,20,2,,,][18-57-2020,41,95,46,73,82,12,72,85,,,][,,,,,,,,,,,]]
+[GetSpreadsheet https://172.20.0.5:8080/rest] sheetId = e1f47b80-b471-4d7e-a974-4e58b882c817, userId = blake.gottlieb, pwd = w6eoe4afjfbwrow -> 200:sheetId = e1f47b80-b471-4d7e-a974-4e58b882c817 ; sheetURL= https://172.20.0.5:8080/rest/spreadsheets/e1f47b80-b471-4d7e-a974-4e58b882c817 ; owner = blake.gottlieb ; dim = 23x12 ; sharedWith = [] ; values = [[,Mali,France,Oman,Dominican Republic,Mayotte,Botswana,Taiwan,Haiti,Netherlands,Oman,South Africa][01-57-2020,67,76,46,5,72,63,21,85,,,][02-57-2020,96,96,75,37,46,98,81,37,,,][03-57-2020,32,54,48,40,61,99,98,49,,,][04-57-2020,83,81,23,12,77,91,18,23,,,][05-57-2020,82,63,63,29,66,89,29,62,,,][06-57-2020,53,27,72,13,37,16,81,53,,,][07-57-2020,59,31,59,22,91,79,71,77,,,][08-57-2020,33,97,88,16,72,6,32,85,,,][09-57-2020,61,96,26,49,65,68,28,33,,,][10-57-2020,72,22,3,1,2,84,26,29,,,][11-57-2020,72,88,69,22,24,70,74,37,,,][12-57-2020,15,83,61,58,51,73,25,9,,,][13-57-2020,33,63,98,54,17,87,12,75,,,][14-57-2020,53,47,22,95,84,54,81,97,,,][15-57-2020,99,69,96,84,80,95,84,90,,,][16-57-2020,95,41,48,28,58,6,86,86,,,][17-57-2020,29,79,82,54,70,55,13,92,,,][18-57-2020,71,47,10,45,69,9,61,37,,,][19-57-2020,30,54,25,72,31,42,36,4,,,][20-57-2020,84,8,58,9,2,47,30,9,,,][21-57-2020,90,25,85,63,36,75,93,87,,,][,,,,,,,,,,,]]
+[GetSpreadsheet https://172.20.0.5:8080/rest] sheetId = f7a88c89-6726-4d56-81cc-d1243574a425, userId = blake.gottlieb, pwd = w6eoe4afjfbwrow -> 200:sheetId = f7a88c89-6726-4d56-81cc-d1243574a425 ; sheetURL= https://172.20.0.5:8080/rest/spreadsheets/f7a88c89-6726-4d56-81cc-d1243574a425 ; owner = blake.gottlieb ; dim = 24x13 ; sharedWith = [] ; values = [[,Venezuela,Mauritania,Seychelles,South Georgia and the South Sandwich Islands,Oman,Indonesia,Saudi Arabia,Kazakhstan,Sierra Leone,Denmark,Antigua and Barbuda,Guadeloupe][01-57-2020,69,92,5,46,32,46,27,11,98,,,][02-57-2020,85,56,34,6,80,92,55,81,37,,,][03-57-2020,0,38,93,83,90,88,24,87,87,,,][04-57-2020,46,94,16,8,93,50,29,11,29,,,][05-57-2020,83,49,92,24,15,90,16,54,37,,,][06-57-2020,99,61,18,52,8,68,96,0,1,,,][07-57-2020,24,91,61,35,88,83,42,98,53,,,][08-57-2020,27,17,80,42,69,74,87,85,34,,,][09-57-2020,73,58,67,93,68,74,79,12,75,,,][10-57-2020,44,79,54,92,64,60,5,22,48,,,][11-57-2020,70,0,2,90,85,50,76,37,30,,,][12-57-2020,2,0,71,25,34,10,13,12,46,,,][13-57-2020,77,8,89,57,20,3,50,39,45,,,][14-57-2020,10,14,28,48,94,71,6,40,4,,,][15-57-2020,75,54,29,56,8,64,86,26,74,,,][16-57-2020,16,5,7,11,61,90,42,73,61,,,][17-57-2020,57,63,48,72,88,62,82,6,81,,,][18-57-2020,65,33,20,57,63,65,47,22,45,,,][19-57-2020,32,12,31,95,70,23,50,0,97,,,][20-57-2020,63,31,0,18,52,33,34,42,12,,,][21-57-2020,45,34,0,32,7,53,44,26,52,,,][22-57-2020,72,97,21,53,16,76,92,48,31,,,][,,,,,,,,,,,,]]
+[GetSpreadsheet https://172.20.0.5:8080/rest] sheetId = c805cfad-13e0-407e-96d9-068fcc5bdee6, userId = dillon.bayer, pwd = gm7h08scerl0y -> 200:sheetId = c805cfad-13e0-407e-96d9-068fcc5bdee6 ; sheetURL= https://172.20.0.5:8080/rest/spreadsheets/c805cfad-13e0-407e-96d9-068fcc5bdee6 ; owner = dillon.bayer ; dim = 24x10 ; sharedWith = [] ; values = [[,Jordan,Cape Verde,El Salvador,Virgin Islands, U.S.,Swaziland,Georgia,Brazil,Haiti,Wallis and Futuna][01-57-2020,72,89,15,49,45,27,,,][02-57-2020,77,99,38,87,35,72,,,][03-57-2020,99,8,46,77,30,71,,,][04-57-2020,13,6,39,37,59,49,,,][05-57-2020,5,63,91,49,29,99,,,][06-57-2020,72,31,7,96,61,16,,,][07-57-2020,82,97,42,62,37,15,,,][08-57-2020,93,28,56,74,43,15,,,][09-57-2020,36,62,43,43,78,87,,,][10-57-2020,54,43,96,78,10,58,,,][11-57-2020,2,47,13,35,22,33,,,][12-57-2020,37,52,10,33,81,47,,,][13-57-2020,9,55,79,98,13,17,,,][14-57-2020,9,13,84,34,90,62,,,][15-57-2020,8,28,42,1,25,91,,,][16-57-2020,59,62,58,23,79,72,,,][17-57-2020,7,0,20,88,65,69,,,][18-57-2020,2,55,29,2,91,61,,,][19-57-2020,16,55,6,55,64,58,,,][20-57-2020,90,0,63,12,10,16,,,][21-57-2020,32,85,25,26,0,63,,,][22-57-2020,16,32,47,22,41,9,,,][,,,,,,,,,]]
+[GetSpreadsheet https://172.20.0.5:8080/rest] sheetId = acb25c6f-40c3-403d-b82d-0568ac4fff53, userId = refugio.bergstrom, pwd = x938brfo -> 200:sheetId = acb25c6f-40c3-403d-b82d-0568ac4fff53 ; sheetURL= https://172.20.0.5:8080/rest/spreadsheets/acb25c6f-40c3-403d-b82d-0568ac4fff53 ; owner = refugio.bergstrom ; dim = 21x12 ; sharedWith = [] ; values = [[,Jersey,Cook Islands,Iraq,Saint Vincent and the Grenadines,Puerto Rico,Benin,Somalia,Falkland Islands (Malvinas),Guernsey,Yemen,Somalia][01-57-2020,55,48,76,12,38,74,86,66,,,][02-57-2020,74,57,91,41,13,71,75,68,,,][03-57-2020,61,41,41,52,61,36,87,66,,,][04-57-2020,10,42,50,48,54,59,88,38,,,][05-57-2020,66,40,18,7,93,73,51,27,,,][06-57-2020,1,3,16,9,84,97,65,46,,,][07-57-2020,27,40,74,65,0,79,15,18,,,][08-57-2020,15,81,69,30,69,54,75,88,,,][09-57-2020,68,72,36,14,30,97,35,36,,,][10-57-2020,83,99,13,46,54,25,30,9,,,][11-57-2020,50,94,65,87,71,29,66,52,,,][12-57-2020,97,46,66,69,39,35,14,17,,,][13-57-2020,49,47,77,16,24,42,32,56,,,][14-57-2020,6,11,99,78,83,30,74,81,,,][15-57-2020,18,49,69,58,90,5,54,48,,,][16-57-2020,74,78,65,36,19,85,63,9,,,][17-57-2020,97,99,21,93,51,18,71,64,,,][18-57-2020,77,49,41,15,22,44,60,53,,,][19-57-2020,43,78,98,2,48,19,85,77,,,][,,,,,,,,,,,]]
+[GetSpreadsheet https://172.20.0.5:8080/rest] sheetId = a5bb535b-84d7-4716-8e02-1ca52fd3dc41, userId = timmy.mohr, pwd = fl93wf84e0jhb1 -> 200:sheetId = a5bb535b-84d7-4716-8e02-1ca52fd3dc41 ; sheetURL= https://172.20.0.5:8080/rest/spreadsheets/a5bb535b-84d7-4716-8e02-1ca52fd3dc41 ; owner = timmy.mohr ; dim = 20x12 ; sharedWith = [] ; values = [[,Russian Federation,Bosnia and Herzegovina,Guatemala,Burundi,Australia,Austria,New Zealand,Australia,France,Niue,Poland][01-57-2020,44,23,97,5,35,72,75,24,,,][02-57-2020,14,17,12,0,64,13,95,95,,,][03-57-2020,56,36,36,62,51,50,62,89,,,][04-57-2020,80,57,48,41,56,21,60,40,,,][05-57-2020,59,44,18,11,68,3,39,99,,,][06-57-2020,66,4,98,11,67,92,42,10,,,][07-57-2020,89,9,2,34,69,13,7,49,,,][08-57-2020,11,59,32,56,1,20,82,2,,,][09-57-2020,44,21,22,82,40,48,51,42,,,][10-57-2020,57,5,8,99,38,12,43,70,,,][11-57-2020,31,20,77,86,36,86,62,67,,,][12-57-2020,59,76,30,55,20,5,6,27,,,][13-57-2020,35,63,61,71,63,57,79,92,,,][14-57-2020,23,3,15,50,42,59,53,86,,,][15-57-2020,53,10,34,88,31,64,68,38,,,][16-57-2020,9,77,67,10,68,45,70,31,,,][17-57-2020,0,54,96,12,61,49,87,49,,,][18-57-2020,93,27,2,66,8,31,7,34,,,][,,,,,,,,,,,]]
+---------- Share & get values
+[ShareSpreadsheet https://172.20.0.5:8080/rest] sheetId = c805cfad-13e0-407e-96d9-068fcc5bdee6, userId = gregory.wiza@domain-1, pwd = gm7h08scerl0y -> 204:null
+[ShareSpreadsheet https://172.20.0.5:8080/rest] sheetId = c805cfad-13e0-407e-96d9-068fcc5bdee6, userId = timmy.mohr@domain-1, pwd = gm7h08scerl0y -> 204:null
+[ShareSpreadsheet https://172.20.0.5:8080/rest] sheetId = c805cfad-13e0-407e-96d9-068fcc5bdee6, userId = lemuel.spencer@domain-1, pwd = gm7h08scerl0y -> 204:null
+sleeping: 2 s                                                                                sleeping: 1 s                                                                                sleeping: 0 s                                                                                                                                                                ---------- Update cell & get values
+[UpdateCell https://172.20.0.5:8080/rest] sheetId = c805cfad-13e0-407e-96d9-068fcc5bdee6, cell = D2, rawValue = 2, pwd = i2p8a933fl, userId = gregory.wiza -> 204:null
+[UpdateCell https://172.20.0.5:8080/rest] sheetId = c805cfad-13e0-407e-96d9-068fcc5bdee6, cell = D2, rawValue = 3, pwd = fl93wf84e0jhb1, userId = timmy.mohr -> 204:null
+[UpdateCell https://172.20.0.5:8080/rest] sheetId = c805cfad-13e0-407e-96d9-068fcc5bdee6, cell = D2, rawValue = 4, pwd = d5p7a5w3kzb, userId = lemuel.spencer -> 204:null
+sleeping: 2 s                                                                                sleeping: 1 s                                                                                sleeping: 0 s                                                                                                                                                                [GetSpreadsheet https://172.20.0.7:8080/rest] sheetId = c805cfad-13e0-407e-96d9-068fcc5bdee6, userId = dillon.bayer, pwd = gm7h08scerl0y -> 200:sheetId = c805cfad-13e0-407e-96d9-068fcc5bdee6 ; sheetURL= https://172.20.0.5:8080/rest/spreadsheets/c805cfad-13e0-407e-96d9-068fcc5bdee6 ; owner = dillon.bayer ; dim = 24x10 ; sharedWith = [timmy.mohr@domain-1, lemuel.spencer@domain-1, gregory.wiza@domain-1] ; values = [[,Jordan,Cape Verde,El Salvador,Virgin Islands, U.S.,Swaziland,Georgia,Brazil,Haiti,Wallis and Futuna][01-57-2020,72,89,4,49,45,27,,,][02-57-2020,77,99,38,87,35,72,,,][03-57-2020,99,8,46,77,30,71,,,][04-57-2020,13,6,39,37,59,49,,,][05-57-2020,5,63,91,49,29,99,,,][06-57-2020,72,31,7,96,61,16,,,][07-57-2020,82,97,42,62,37,15,,,][08-57-2020,93,28,56,74,43,15,,,][09-57-2020,36,62,43,43,78,87,,,][10-57-2020,54,43,96,78,10,58,,,][11-57-2020,2,47,13,35,22,33,,,][12-57-2020,37,52,10,33,81,47,,,][13-57-2020,9,55,79,98,13,17,,,][14-57-2020,9,13,84,34,90,62,,,][15-57-2020,8,28,42,1,25,91,,,][16-57-2020,59,62,58,23,79,72,,,][17-57-2020,7,0,20,88,65,69,,,][18-57-2020,2,55,29,2,91,61,,,][19-57-2020,16,55,6,55,64,58,,,][20-57-2020,90,0,63,12,10,16,,,][21-57-2020,32,85,25,26,0,63,,,][22-57-2020,16,32,47,22,41,9,,,][,,,,,,,,,]]
+[GetSpreadsheet https://172.20.0.6:8080/rest] sheetId = c805cfad-13e0-407e-96d9-068fcc5bdee6, userId = dillon.bayer, pwd = gm7h08scerl0y -> 200:sheetId = c805cfad-13e0-407e-96d9-068fcc5bdee6 ; sheetURL= https://172.20.0.5:8080/rest/spreadsheets/c805cfad-13e0-407e-96d9-068fcc5bdee6 ; owner = dillon.bayer ; dim = 24x10 ; sharedWith = [timmy.mohr@domain-1, lemuel.spencer@domain-1, gregory.wiza@domain-1] ; values = [[,Jordan,Cape Verde,El Salvador,Virgin Islands, U.S.,Swaziland,Georgia,Brazil,Haiti,Wallis and Futuna][01-57-2020,72,89,4,49,45,27,,,][02-57-2020,77,99,38,87,35,72,,,][03-57-2020,99,8,46,77,30,71,,,][04-57-2020,13,6,39,37,59,49,,,][05-57-2020,5,63,91,49,29,99,,,][06-57-2020,72,31,7,96,61,16,,,][07-57-2020,82,97,42,62,37,15,,,][08-57-2020,93,28,56,74,43,15,,,][09-57-2020,36,62,43,43,78,87,,,][10-57-2020,54,43,96,78,10,58,,,][11-57-2020,2,47,13,35,22,33,,,][12-57-2020,37,52,10,33,81,47,,,][13-57-2020,9,55,79,98,13,17,,,][14-57-2020,9,13,84,34,90,62,,,][15-57-2020,8,28,42,1,25,91,,,][16-57-2020,59,62,58,23,79,72,,,][17-57-2020,7,0,20,88,65,69,,,][18-57-2020,2,55,29,2,91,61,,,][19-57-2020,16,55,6,55,64,58,,,][20-57-2020,90,0,63,12,10,16,,,][21-57-2020,32,85,25,26,0,63,,,][22-57-2020,16,32,47,22,41,9,,,][,,,,,,,,,]]
+[GetSpreadsheet https://172.20.0.5:8080/rest] sheetId = c805cfad-13e0-407e-96d9-068fcc5bdee6, userId = dillon.bayer, pwd = gm7h08scerl0y -> 200:sheetId = c805cfad-13e0-407e-96d9-068fcc5bdee6 ; sheetURL= https://172.20.0.5:8080/rest/spreadsheets/c805cfad-13e0-407e-96d9-068fcc5bdee6 ; owner = dillon.bayer ; dim = 24x10 ; sharedWith = [timmy.mohr@domain-1, lemuel.spencer@domain-1, gregory.wiza@domain-1] ; values = [[,Jordan,Cape Verde,El Salvador,Virgin Islands, U.S.,Swaziland,Georgia,Brazil,Haiti,Wallis and Futuna][01-57-2020,72,89,4,49,45,27,,,][02-57-2020,77,99,38,87,35,72,,,][03-57-2020,99,8,46,77,30,71,,,][04-57-2020,13,6,39,37,59,49,,,][05-57-2020,5,63,91,49,29,99,,,][06-57-2020,72,31,7,96,61,16,,,][07-57-2020,82,97,42,62,37,15,,,][08-57-2020,93,28,56,74,43,15,,,][09-57-2020,36,62,43,43,78,87,,,][10-57-2020,54,43,96,78,10,58,,,][11-57-2020,2,47,13,35,22,33,,,][12-57-2020,37,52,10,33,81,47,,,][13-57-2020,9,55,79,98,13,17,,,][14-57-2020,9,13,84,34,90,62,,,][15-57-2020,8,28,42,1,25,91,,,][16-57-2020,59,62,58,23,79,72,,,][17-57-2020,7,0,20,88,65,69,,,][18-57-2020,2,55,29,2,91,61,,,][19-57-2020,16,55,6,55,64,58,,,][20-57-2020,90,0,63,12,10,16,,,][21-57-2020,32,85,25,26,0,63,,,][22-57-2020,16,32,47,22,41,9,,,][,,,,,,,,,]]
+---------- Start network failure for replica 1 for 40000 ms and executing ops
+exec [/sbin/iptables -A INPUT -p tcp --destination-port 8080 -j DROP] in sheets2.domain-1 >>> out:
+[UpdateCell https://172.20.0.5:8080/rest] sheetId = c805cfad-13e0-407e-96d9-068fcc5bdee6, cell = B2, rawValue = 1925526952, pwd = gm7h08scerl0y, userId = dillon.bayer -> 204:null
+[UpdateCell https://172.20.0.5:8080/rest] sheetId = c805cfad-13e0-407e-96d9-068fcc5bdee6, cell = B3, rawValue = 1505162429, pwd = gm7h08scerl0y, userId = dillon.bayer -> 204:null
+[UpdateCell https://172.20.0.5:8080/rest] sheetId = c805cfad-13e0-407e-96d9-068fcc5bdee6, cell = B4, rawValue = 1872762522, pwd = gm7h08scerl0y, userId = dillon.bayer -> 204:null
+[UpdateCell https://172.20.0.5:8080/rest] sheetId = c805cfad-13e0-407e-96d9-068fcc5bdee6, cell = B5, rawValue = 1940449537, pwd = gm7h08scerl0y, userId = dillon.bayer -> 204:null
+[UpdateCell https://172.20.0.5:8080/rest] sheetId = c805cfad-13e0-407e-96d9-068fcc5bdee6, cell = B6, rawValue = -1495451098, pwd = gm7h08scerl0y, userId = dillon.bayer -> 204:null
+[UpdateCell https://172.20.0.5:8080/rest] sheetId = c805cfad-13e0-407e-96d9-068fcc5bdee6, cell = B7, rawValue = -1451462516, pwd = gm7h08scerl0y, userId = dillon.bayer -> 204:null
+[UpdateCell https://172.20.0.5:8080/rest] sheetId = c805cfad-13e0-407e-96d9-068fcc5bdee6, cell = B8, rawValue = -1149151000, pwd = gm7h08scerl0y, userId = dillon.bayer -> 204:null
+[UpdateCell https://172.20.0.5:8080/rest] sheetId = c805cfad-13e0-407e-96d9-068fcc5bdee6, cell = B9, rawValue = -1877749141, pwd = gm7h08scerl0y, userId = dillon.bayer -> 204:null
+[UpdateCell https://172.20.0.5:8080/rest] sheetId = c805cfad-13e0-407e-96d9-068fcc5bdee6, cell = B10, rawValue = 1242147080, pwd = gm7h08scerl0y, userId = dillon.bayer -> 204:null
+[UpdateCell https://172.20.0.5:8080/rest] sheetId = c805cfad-13e0-407e-96d9-068fcc5bdee6, cell = B11, rawValue = 1390369879, pwd = gm7h08scerl0y, userId = dillon.bayer -> 204:null
+exec [/sbin/iptables --flush] in sheets2.domain-1 >>> out:
+[GetSpreadsheetValues https://172.20.0.7:8080/rest] sheetId = c805cfad-13e0-407e-96d9-068fcc5bdee6, userId = dillon.bayer, pwd = gm7h08scerl0y -> 200:[[,Jordan,Cape Verde,El Salvador,Virgin Islands, U.S.,Swaziland,Georgia,Brazil,Haiti,Wallis and Futuna][01-57-2020,1.925526952E9,89.0,4.0,49.0,45.0,27.0,,,][02-57-2020,1.505162429E9,99.0,38.0,87.0,35.0,72.0,,,][03-57-2020,1.872762522E9,8.0,46.0,77.0,30.0,71.0,,,][04-57-2020,1.940449537E9,6.0,39.0,37.0,59.0,49.0,,,][05-57-2020,-1.495451098E9,63.0,91.0,49.0,29.0,99.0,,,][06-57-2020,-1.451462516E9,31.0,7.0,96.0,61.0,16.0,,,][07-57-2020,-1.149151E9,97.0,42.0,62.0,37.0,15.0,,,][08-57-2020,-1.877749141E9,28.0,56.0,74.0,43.0,15.0,,,][09-57-2020,1.24214708E9,62.0,43.0,43.0,78.0,87.0,,,][10-57-2020,1.390369879E9,43.0,96.0,78.0,10.0,58.0,,,][11-57-2020,2.0,47.0,13.0,35.0,22.0,33.0,,,][12-57-2020,37.0,52.0,10.0,33.0,81.0,47.0,,,][13-57-2020,9.0,55.0,79.0,98.0,13.0,17.0,,,][14-57-2020,9.0,13.0,84.0,34.0,90.0,62.0,,,][15-57-2020,8.0,28.0,42.0,1.0,25.0,91.0,,,][16-57-2020,59.0,62.0,58.0,23.0,79.0,72.0,,,][17-57-2020,7.0,0.0,20.0,88.0,65.0,69.0,,,][18-57-2020,2.0,55.0,29.0,2.0,91.0,61.0,,,][19-57-2020,16.0,55.0,6.0,55.0,64.0,58.0,,,][20-57-2020,90.0,0.0,63.0,12.0,10.0,16.0,,,][21-57-2020,32.0,85.0,25.0,26.0,0.0,63.0,,,][22-57-2020,16.0,32.0,47.0,22.0,41.0,9.0,,,][,,,,,,,,,]]
+[GetSpreadsheetValues https://172.20.0.6:8080/rest] sheetId = c805cfad-13e0-407e-96d9-068fcc5bdee6, userId = dillon.bayer, pwd = gm7h08scerl0y -> 200:[[,Jordan,Cape Verde,El Salvador,Virgin Islands, U.S.,Swaziland,Georgia,Brazil,Haiti,Wallis and Futuna][01-57-2020,1.925526952E9,89.0,4.0,49.0,45.0,27.0,,,][02-57-2020,1.505162429E9,99.0,38.0,87.0,35.0,72.0,,,][03-57-2020,1.872762522E9,8.0,46.0,77.0,30.0,71.0,,,][04-57-2020,1.940449537E9,6.0,39.0,37.0,59.0,49.0,,,][05-57-2020,-1.495451098E9,63.0,91.0,49.0,29.0,99.0,,,][06-57-2020,-1.451462516E9,31.0,7.0,96.0,61.0,16.0,,,][07-57-2020,-1.149151E9,97.0,42.0,62.0,37.0,15.0,,,][08-57-2020,-1.877749141E9,28.0,56.0,74.0,43.0,15.0,,,][09-57-2020,1.24214708E9,62.0,43.0,43.0,78.0,87.0,,,][10-57-2020,54.0,43.0,96.0,78.0,10.0,58.0,,,][11-57-2020,2.0,47.0,13.0,35.0,22.0,33.0,,,][12-57-2020,37.0,52.0,10.0,33.0,81.0,47.0,,,][13-57-2020,9.0,55.0,79.0,98.0,13.0,17.0,,,][14-57-2020,9.0,13.0,84.0,34.0,90.0,62.0,,,][15-57-2020,8.0,28.0,42.0,1.0,25.0,91.0,,,][16-57-2020,59.0,62.0,58.0,23.0,79.0,72.0,,,][17-57-2020,7.0,0.0,20.0,88.0,65.0,69.0,,,][18-57-2020,2.0,55.0,29.0,2.0,91.0,61.0,,,][19-57-2020,16.0,55.0,6.0,55.0,64.0,58.0,,,][20-57-2020,90.0,0.0,63.0,12.0,10.0,16.0,,,][21-57-2020,32.0,85.0,25.0,26.0,0.0,63.0,,,][22-57-2020,16.0,32.0,47.0,22.0,41.0,9.0,,,][,,,,,,,,,]]
+TestFailedException: GetSpreadsheetValues; id = c805cfad-13e0-407e-96d9-068fcc5bdee6 ; userId = dillon.bayer ; pwd = gm7h08scerl0y
+Expected : [[,Jordan,Cape Verde,El Salvador,Virgin Islands, U.S.,Swaziland,Georgia,Brazil,Haiti,Wallis and Futuna][01-57-2020,1.925526952E9,89.0,4.0,49.0,45.0,27.0,,,][02-57-2020,1.505162429E9,99.0,38.0,87.0,35.0,72.0,,,][03-57-2020,1.872762522E9,8.0,46.0,77.0,30.0,71.0,,,][04-57-2020,1.940449537E9,6.0,39.0,37.0,59.0,49.0,,,][05-57-2020,-1.495451098E9,63.0,91.0,49.0,29.0,99.0,,,][06-57-2020,-1.451462516E9,31.0,7.0,96.0,61.0,16.0,,,][07-57-2020,-1.149151E9,97.0,42.0,62.0,37.0,15.0,,,][08-57-2020,-1.877749141E9,28.0,56.0,74.0,43.0,15.0,,,][09-57-2020,1.24214708E9,62.0,43.0,43.0,78.0,87.0,,,][10-57-2020,1.390369879E9,43.0,96.0,78.0,10.0,58.0,,,][11-57-2020,2.0,47.0,13.0,35.0,22.0,33.0,,,][12-57-2020,37.0,52.0,10.0,33.0,81.0,47.0,,,][13-57-2020,9.0,55.0,79.0,98.0,13.0,17.0,,,][14-57-2020,9.0,13.0,84.0,34.0,90.0,62.0,,,][15-57-2020,8.0,28.0,42.0,1.0,25.0,91.0,,,][16-57-2020,59.0,62.0,58.0,23.0,79.0,72.0,,,][17-57-2020,7.0,0.0,20.0,88.0,65.0,69.0,,,][18-57-2020,2.0,55.0,29.0,2.0,91.0,61.0,,,][19-57-2020,16.0,55.0,6.0,55.0,64.0,58.0,,,][20-57-2020,90.0,0.0,63.0,12.0,10.0,16.0,,,][21-57-2020,32.0,85.0,25.0,26.0,0.0,63.0,,,][22-57-2020,16.0,32.0,47.0,22.0,41.0,9.0,,,][,,,,,,,,,]]; received : [[,Jordan,Cape Verde,El Salvador,Virgin Islands, U.S.,Swaziland,Georgia,Brazil,Haiti,Wallis and Futuna][01-57-2020,1.925526952E9,89.0,4.0,49.0,45.0,27.0,,,][02-57-2020,1.505162429E9,99.0,38.0,87.0,35.0,72.0,,,][03-57-2020,1.872762522E9,8.0,46.0,77.0,30.0,71.0,,,][04-57-2020,1.940449537E9,6.0,39.0,37.0,59.0,49.0,,,][05-57-2020,-1.495451098E9,63.0,91.0,49.0,29.0,99.0,,,][06-57-2020,-1.451462516E9,31.0,7.0,96.0,61.0,16.0,,,][07-57-2020,-1.149151E9,97.0,42.0,62.0,37.0,15.0,,,][08-57-2020,-1.877749141E9,28.0,56.0,74.0,43.0,15.0,,,][09-57-2020,1.24214708E9,62.0,43.0,43.0,78.0,87.0,,,][10-57-2020,54.0,43.0,96.0,78.0,10.0,58.0,,,][11-57-2020,2.0,47.0,13.0,35.0,22.0,33.0,,,][12-57-2020,37.0,52.0,10.0,33.0,81.0,47.0,,,][13-57-2020,9.0,55.0,79.0,98.0,13.0,17.0,,,][14-57-2020,9.0,13.0,84.0,34.0,90.0,62.0,,,][15-57-2020,8.0,28.0,42.0,1.0,25.0,91.0,,,][16-57-2020,59.0,62.0,58.0,23.0,79.0,72.0,,,][17-57-2020,7.0,0.0,20.0,88.0,65.0,69.0,,,][18-57-2020,2.0,55.0,29.0,2.0,91.0,61.0,,,][19-57-2020,16.0,55.0,6.0,55.0,64.0,58.0,,,][20-57-2020,90.0,0.0,63.0,12.0,10.0,16.0,,,][21-57-2020,32.0,85.0,25.0,26.0,0.0,63.0,,,][22-57-2020,16.0,32.0,47.0,22.0,41.0,9.0,,,][,,,,,,,,,]]
+	at tp1.SiteState.execGetSpreadsheetValues(SiteState.java:541)
+	at tp1.SiteState.execGetSpreadsheetValues(SiteState.java:516)
+	at tests.SheetsTest.execGetSpreadsheetValues(SheetsTest.java:411)
+	at tests.workloads.FaultsNetReplicationSingleDomainMixWorkload.execute(FaultsNetReplicationSingleDomainMixWorkload.java:146)
+	at tests.BaseTest.test(BaseTest.java:223)
+	at tests.Tester.lambda$main$97(Tester.java:377)
+	at tests.Tester.doRun(Tester.java:562)
+	at tests.Tester.main(Tester.java:377)
+FAILED: GetSpreadsheetValues; id = c805cfad-13e0-407e-96d9-068fcc5bdee6 ; userId = dillon.bayer ; pwd = gm7h08scerl0y
+Expected : [[,Jordan,Cape Verde,El Salvador,Virgin Islands, U.S.,Swaziland,Georgia,Brazil,Haiti,Wallis and Futuna][01-57-2020,1.925526952E9,89.0,4.0,49.0,45.0,27.0,,,][02-57-2020,1.505162429E9,99.0,38.0,87.0,35.0,72.0,,,][03-57-2020,1.872762522E9,8.0,46.0,77.0,30.0,71.0,,,][04-57-2020,1.940449537E9,6.0,39.0,37.0,59.0,49.0,,,][05-57-2020,-1.495451098E9,63.0,91.0,49.0,29.0,99.0,,,][06-57-2020,-1.451462516E9,31.0,7.0,96.0,61.0,16.0,,,][07-57-2020,-1.149151E9,97.0,42.0,62.0,37.0,15.0,,,][08-57-2020,-1.877749141E9,28.0,56.0,74.0,43.0,15.0,,,][09-57-2020,1.24214708E9,62.0,43.0,43.0,78.0,87.0,,,][10-57-2020,1.390369879E9,43.0,96.0,78.0,10.0,58.0,,,][11-57-2020,2.0,47.0,13.0,35.0,22.0,33.0,,,][12-57-2020,37.0,52.0,10.0,33.0,81.0,47.0,,,][13-57-2020,9.0,55.0,79.0,98.0,13.0,17.0,,,][14-57-2020,9.0,13.0,84.0,34.0,90.0,62.0,,,][15-57-2020,8.0,28.0,42.0,1.0,25.0,91.0,,,][16-57-2020,59.0,62.0,58.0,23.0,79.0,72.0,,,][17-57-2020,7.0,0.0,20.0,88.0,65.0,69.0,,,][18-57-2020,2.0,55.0,29.0,2.0,91.0,61.0,,,][19-57-2020,16.0,55.0,6.0,55.0,64.0,58.0,,,][20-57-2020,90.0,0.0,63.0,12.0,10.0,16.0,,,][21-57-2020,32.0,85.0,25.0,26.0,0.0,63.0,,,][22-57-2020,16.0,32.0,47.0,22.0,41.0,9.0,,,][,,,,,,,,,]]; received : [[,Jordan,Cape Verde,El Salvador,Virgin Islands, U.S.,Swaziland,Georgia,Brazil,Haiti,Wallis and Futuna][01-57-2020,1.925526952E9,89.0,4.0,49.0,45.0,27.0,,,][02-57-2020,1.505162429E9,99.0,38.0,87.0,35.0,72.0,,,][03-57-2020,1.872762522E9,8.0,46.0,77.0,30.0,71.0,,,][04-57-2020,1.940449537E9,6.0,39.0,37.0,59.0,49.0,,,][05-57-2020,-1.495451098E9,63.0,91.0,49.0,29.0,99.0,,,][06-57-2020,-1.451462516E9,31.0,7.0,96.0,61.0,16.0,,,][07-57-2020,-1.149151E9,97.0,42.0,62.0,37.0,15.0,,,][08-57-2020,-1.877749141E9,28.0,56.0,74.0,43.0,15.0,,,][09-57-2020,1.24214708E9,62.0,43.0,43.0,78.0,87.0,,,][10-57-2020,54.0,43.0,96.0,78.0,10.0,58.0,,,][11-57-2020,2.0,47.0,13.0,35.0,22.0,33.0,,,][12-57-2020,37.0,52.0,10.0,33.0,81.0,47.0,,,][13-57-2020,9.0,55.0,79.0,98.0,13.0,17.0,,,][14-57-2020,9.0,13.0,84.0,34.0,90.0,62.0,,,][15-57-2020,8.0,28.0,42.0,1.0,25.0,91.0,,,][16-57-2020,59.0,62.0,58.0,23.0,79.0,72.0,,,][17-57-2020,7.0,0.0,20.0,88.0,65.0,69.0,,,][18-57-2020,2.0,55.0,29.0,2.0,91.0,61.0,,,][19-57-2020,16.0,55.0,6.0,55.0,64.0,58.0,,,][20-57-2020,90.0,0.0,63.0,12.0,10.0,16.0,,,][21-57-2020,32.0,85.0,25.0,26.0,0.0,63.0,,,][22-57-2020,16.0,32.0,47.0,22.0,41.0,9.0,,,][,,,,,,,,,]]
+
+
+Removing: kafka
+Removing: users.domain-1
+Removing: sheets.domain-1
+Removing: sheets2.domain-1
+Removing: sheets3.domain-1
+-----------------------------------------------------------------------------------
+kafka
+-----------------------------------------------------------------------------------
+2021-06-07 13:57:00,669 CRIT Supervisor is running as root.  Privileges were not dropped because no user is specified in the config file.  If you intend to run as root, you can set user=root in the config file to avoid this message.
+2021-06-07 13:57:00,669 INFO Included extra file "/etc/supervisor/conf.d/kafka.conf" during parsing
+2021-06-07 13:57:00,670 INFO Included extra file "/etc/supervisor/conf.d/zookeeper.conf" during parsing
+2021-06-07 13:57:00,675 INFO RPC interface 'supervisor' initialized
+2021-06-07 13:57:00,675 CRIT Server 'unix_http_server' running without any HTTP authentication checking
+2021-06-07 13:57:00,675 INFO supervisord started with pid 9
+2021-06-07 13:57:01,679 INFO spawned: 'zookeeper' with pid 12
+2021-06-07 13:57:01,682 INFO spawned: 'kafka' with pid 13
+2021-06-07 13:57:02,692 INFO success: zookeeper entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2021-06-07 13:57:02,692 INFO success: kafka entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+
+-----------------------------------------------------------------------------------
+users.domain-1
+-----------------------------------------------------------------------------------
+WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.glassfish.jaxb.runtime.v2.runtime.reflect.opt.Injector (file:/home/sd/sd2021.jar) to method java.lang.ClassLoader.defineClass(java.lang.String,byte[],int,int)
+WARNING: Please consider reporting this to the maintainers of org.glassfish.jaxb.runtime.v2.runtime.reflect.opt.Injector
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release
+WARNING: A provider tp1.impl.servers.rest.UsersResource registered in SERVER runtime does not implement any provider interfaces applicable in the SERVER runtime. Due to constraint configuration problems the provider tp1.impl.servers.rest.UsersResource will be ignored. INFO: users Server ready @ https://172.20.0.4:8080/rest
+
+-----------------------------------------------------------------------------------
+sheets.domain-1
+-----------------------------------------------------------------------------------
+log4j:WARN No appenders could be found for logger (org.apache.zookeeper.ZooKeeper).
+log4j:WARN Please initialize the log4j system properly.
+log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
+WatchedEvent state:SyncConnected type:None path:null
+/domain-1
+/domain-1/sheets_0000000000
+https://172.20.0.5:8080/rest
+WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.glassfish.jaxb.runtime.v2.runtime.reflect.opt.Injector (file:/home/sd/sd2021.jar) to method java.lang.ClassLoader.defineClass(java.lang.String,byte[],int,int)
+WARNING: Please consider reporting this to the maintainers of org.glassfish.jaxb.runtime.v2.runtime.reflect.opt.Injector
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release
+WARNING: A provider tp1.impl.servers.rest.replication.SpreadsheetsRepResource registered in SERVER runtime does not implement any provider interfaces applicable in the SERVER runtime. Due to constraint configuration problems the provider tp1.impl.servers.rest.replication.SpreadsheetsRepResource will be ignored. INFO: sheets Server ready @ https://172.20.0.5:8080/rest
+versao antes de atualizar: 0
+versao atualizada: 1
+versao antes de atualizar: 1
+versao atualizada: 2
+versao antes de atualizar: 2
+versao atualizada: 3
+versao antes de atualizar: 3
+versao atualizada: 4
+versao antes de atualizar: 4
+versao atualizada: 5
+versao antes de atualizar: 5
+versao atualizada: 6
+versao antes de atualizar: 6
+versao atualizada: 7
+versao antes de atualizar: 7
+versao atualizada: 8
+versao antes de atualizar: 8
+versao atualizada: 9
+versao antes de atualizar: 9
+versao atualizada: 10
+versao antes de atualizar: 10
+versao atualizada: 11
+versao antes de atualizar: 11
+versao atualizada: 12
+versao antes de atualizar: 12
+versao atualizada: 13
+versao antes de atualizar: 13
+versao atualizada: 14
+versao antes de atualizar: 14
+versao atualizada: 15
+versao antes de atualizar: 15
+versao atualizada: 16
+versao antes de atualizar: 16
+versao atualizada: 17
+versao antes de atualizar: 17
+versao atualizada: 18
+versao antes de atualizar: 18
+versao atualizada: 19
+versao antes de atualizar: 19
+versao atualizada: 20
+versao antes de atualizar: 20
+versao atualizada: 21
+versao antes de atualizar: 21
+versao atualizada: 22
+versao antes de atualizar: 22
+versao atualizada: 23
+versao antes de atualizar: 23
+versao atualizada: 24
+versao antes de atualizar: 24
+versao atualizada: 25
+versao antes de atualizar: 25
+versao atualizada: 26
+
+-----------------------------------------------------------------------------------
+sheets2.domain-1
+-----------------------------------------------------------------------------------
+log4j:WARN No appenders could be found for logger (org.apache.zookeeper.ZooKeeper).
+log4j:WARN Please initialize the log4j system properly.
+log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
+WatchedEvent state:SyncConnected type:None path:null
+org.apache.zookeeper.KeeperException$NodeExistsException: KeeperErrorCode = NodeExists for /domain-1
+	at org.apache.zookeeper.KeeperException.create(KeeperException.java:122)
+	at org.apache.zookeeper.KeeperException.create(KeeperException.java:54)
+	at org.apache.zookeeper.ZooKeeper.create(ZooKeeper.java:786)
+	at tp1.zookeeper.ZookeeperProcessor.write(ZookeeperProcessor.java:26)
+	at tp1.impl.servers.rest.replication.SpreadsheetsRepServer.main(SpreadsheetsRepServer.java:47)
+null
+/domain-1/sheets_0000000001
+https://172.20.0.6:8080/rest
+WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.glassfish.jaxb.runtime.v2.runtime.reflect.opt.Injector (file:/home/sd/sd2021.jar) to method java.lang.ClassLoader.defineClass(java.lang.String,byte[],int,int)
+WARNING: Please consider reporting this to the maintainers of org.glassfish.jaxb.runtime.v2.runtime.reflect.opt.Injector
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release
+WARNING: A provider tp1.impl.servers.rest.replication.SpreadsheetsRepResource registered in SERVER runtime does not implement any provider interfaces applicable in the SERVER runtime. Due to constraint configuration problems the provider tp1.impl.servers.rest.replication.SpreadsheetsRepResource will be ignored. INFO: sheets Server ready @ https://172.20.0.6:8080/rest
+versao antes de atualizar: 0
+versao atualizada: 1
+versao antes de atualizar: 1
+versao atualizada: 2
+versao antes de atualizar: 2
+versao atualizada: 3
+versao antes de atualizar: 3
+versao atualizada: 4
+versao antes de atualizar: 4
+versao atualizada: 5
+versao antes de atualizar: 5
+versao atualizada: 6
+versao antes de atualizar: 6
+versao atualizada: 7
+versao antes de atualizar: 7
+versao atualizada: 8
+versao antes de atualizar: 8
+versao atualizada: 9
+versao antes de atualizar: 9
+versao atualizada: 10
+versao antes de atualizar: 10
+versao atualizada: 11
+versao antes de atualizar: 11
+versao atualizada: 12
+versao antes de atualizar: 12
+versao atualizada: 13
+versao antes de atualizar: 13
+versao atualizada: 14
+versao antes de atualizar: 14
+versao atualizada: 15
+versao antes de atualizar: 15
+versao atualizada: 16
+recebeu pedido c805cfad-13e0-407e-96d9-068fcc5bdee6
+comparacao versoes 26 16
+pediu update c805cfad-13e0-407e-96d9-068fcc5bdee6
+versao antes de atualizar: 16
+versao atualizada: 17
+versao antes de atualizar: 17
+versao atualizada: 18
+versao antes de atualizar: 18
+versao atualizada: 19
+versao antes de atualizar: 19
+versao atualizada: 20
+versao antes de atualizar: 20
+versao atualizada: 21
+versao antes de atualizar: 21
+versao atualizada: 22
+versao antes de atualizar: 22
+versao atualizada: 23
+versao antes de atualizar: 23
+versao atualizada: 24
+versao antes de atualizar: 24
+versao atualizada: 25
+pedido update acabou c805cfad-13e0-407e-96d9-068fcc5bdee6 25
+
+-----------------------------------------------------------------------------------
+sheets3.domain-1
+-----------------------------------------------------------------------------------
+log4j:WARN No appenders could be found for logger (org.apache.zookeeper.ZooKeeper).
+log4j:WARN Please initialize the log4j system properly.
+log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
+WatchedEvent state:SyncConnected type:None path:null
+org.apache.zookeeper.KeeperException$NodeExistsException: KeeperErrorCode = NodeExists for /domain-1
+	at org.apache.zookeeper.KeeperException.create(KeeperException.java:122)
+	at org.apache.zookeeper.KeeperException.create(KeeperException.java:54)
+	at org.apache.zookeeper.ZooKeeper.create(ZooKeeper.java:786)
+	at tp1.zookeeper.ZookeeperProcessor.write(ZookeeperProcessor.java:26)
+	at tp1.impl.servers.rest.replication.SpreadsheetsRepServer.main(SpreadsheetsRepServer.java:47)
+null
+/domain-1/sheets_0000000002
+https://172.20.0.7:8080/rest
+WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.glassfish.jaxb.runtime.v2.runtime.reflect.opt.Injector (file:/home/sd/sd2021.jar) to method java.lang.ClassLoader.defineClass(java.lang.String,byte[],int,int)
+WARNING: Please consider reporting this to the maintainers of org.glassfish.jaxb.runtime.v2.runtime.reflect.opt.Injector
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release
+WARNING: A provider tp1.impl.servers.rest.replication.SpreadsheetsRepResource registered in SERVER runtime does not implement any provider interfaces applicable in the SERVER runtime. Due to constraint configuration problems the provider tp1.impl.servers.rest.replication.SpreadsheetsRepResource will be ignored. INFO: sheets Server ready @ https://172.20.0.7:8080/rest
+versao antes de atualizar: 0
+versao atualizada: 1
+versao antes de atualizar: 1
+versao atualizada: 2
+versao antes de atualizar: 2
+versao atualizada: 3
+versao antes de atualizar: 3
+versao atualizada: 4
+versao antes de atualizar: 4
+versao atualizada: 5
+versao antes de atualizar: 5
+versao atualizada: 6
+versao antes de atualizar: 6
+versao atualizada: 7
+versao antes de atualizar: 7
+versao atualizada: 8
+versao antes de atualizar: 8
+versao atualizada: 9
+versao antes de atualizar: 9
+versao atualizada: 10
+versao antes de atualizar: 10
+versao atualizada: 11
+versao antes de atualizar: 11
+versao atualizada: 12
+versao antes de atualizar: 12
+versao atualizada: 13
+versao antes de atualizar: 13
+versao atualizada: 14
+versao antes de atualizar: 14
+versao atualizada: 15
+versao antes de atualizar: 15
+versao atualizada: 16
+versao antes de atualizar: 16
+versao atualizada: 17
+versao antes de atualizar: 17
+versao atualizada: 18
+versao antes de atualizar: 18
+versao atualizada: 19
+versao antes de atualizar: 19
+versao atualizada: 20
+versao antes de atualizar: 20
+versao atualizada: 21
+versao antes de atualizar: 21
+versao atualizada: 22
+versao antes de atualizar: 22
+versao atualizada: 23
+versao antes de atualizar: 23
+versao atualizada: 24
+versao antes de atualizar: 24
+versao atualizada: 25
+versao antes de atualizar: 25
+versao atualizada: 26
+recebeu pedido c805cfad-13e0-407e-96d9-068fcc5bdee6
+comparacao versoes 26 26
+
+
+
+Continue (Y/N) ?
+^C

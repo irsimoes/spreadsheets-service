@@ -8,6 +8,7 @@ import java.net.MulticastSocket;
 import java.net.NetworkInterface;
 import java.net.URI;
 import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * <p>A class to perform service discovery, based on periodic service contact endpoint 
@@ -105,6 +106,25 @@ public class Discovery {
 					}
 				}
 			}).start();
+
+			new Thread(() -> {
+				while(active) {
+					try {
+						for (Map<URI, Long> map : services.values()) {
+							Iterator<Entry<URI, Long>> it = map.entrySet().iterator();
+							while(it.hasNext()){
+								Entry<URI, Long> entry = it.next();
+								if(System.currentTimeMillis() - entry.getValue() > DISCOVERY_TIMEOUT) it.remove();
+							}
+						}
+						Thread.sleep(DISCOVERY_PERIOD);
+					} catch (Exception e) {
+						e.printStackTrace();
+						// do nothing
+					}
+				}
+			}).start();
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -115,7 +135,6 @@ public class Discovery {
 		active = false;
 	}
 
-	
 	public URI[] knownUrisOf(String domain, String service) {
 		String serviceName = String.format("%s:%s", domain, service);
 		URI[] uris;

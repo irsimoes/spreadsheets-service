@@ -27,6 +27,7 @@ import jakarta.xml.ws.BindingProvider;
 import jakarta.xml.ws.Service;
 import jakarta.xml.ws.WebServiceException;
 import tp1.api.Spreadsheet;
+import tp1.api.ValuesResult;
 import tp1.api.service.rest.*;
 import tp1.api.service.soap.SheetsException;
 import tp1.api.service.soap.SoapSpreadsheets;
@@ -36,7 +37,6 @@ import tp1.discovery.Discovery;
 import tp1.api.engine.*;
 import tp1.api.replies.GoogleSheetValuesReturn;
 import tp1.impl.engine.SpreadsheetEngineImpl;
-import tp1.impl.servers.rest.ValuesResult;
 import tp1.impl.servers.rest.DB.requests.*;
 import tp1.impl.servers.soap.SpreadsheetsWS;
 import tp1.impl.servers.soap.UsersWS;
@@ -147,7 +147,7 @@ public class DBSpreadsheetsResource implements RestSpreadsheets {
 	}
 
 	@Override
-	public Spreadsheet getSpreadsheet(String sheetId, String userId, String password) {
+	public Spreadsheet getSpreadsheet(int version, String sheetId, String userId, String password) {
 
 		if (sheetId == null || userId == null) {
 			throw new WebApplicationException(Status.BAD_REQUEST); // 400
@@ -172,7 +172,7 @@ public class DBSpreadsheetsResource implements RestSpreadsheets {
 	}
 
 	@Override
-	public String[][] getSpreadsheetValues(String sheetId, String userId, String password) {
+	public String[][] getSpreadsheetValues(int version, String sheetId, String userId, String password) {
 
 		if (sheetId == null || userId == null) {
 			throw new WebApplicationException(Status.BAD_REQUEST); // 400
@@ -329,7 +329,7 @@ public class DBSpreadsheetsResource implements RestSpreadsheets {
 	}
 
 	@Override
-	public ValuesResult getRange(String sheetId, String userId, String userDomain, String range, String serverSecret,
+	public ValuesResult getRange(int version, String sheetId, String userId, String userDomain, String range, String serverSecret,
 			long twClient) {
 
 		if (!serverSecret.equals(DBSpreadsheetsResource.serverSecret)) {
