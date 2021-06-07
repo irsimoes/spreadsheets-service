@@ -15,7 +15,7 @@ public interface RestRepSpreadsheets extends RestSpreadsheets {
 	@POST
 	@Path("/execute")
 	@Consumes(MediaType.APPLICATION_JSON)
-	void executeOperation(Operation operation, @QueryParam("serverSecret") String serverSecret);
+	void executeOperation(Operation operation, @QueryParam("uri") String uri, @QueryParam("serverSecret") String serverSecret);
 	
 	@GET
 	@Path("/state")

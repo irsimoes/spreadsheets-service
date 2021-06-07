@@ -957,7 +957,8 @@ public class SpreadsheetsRepResource implements RestRepSpreadsheets {
 
 					while (!success && retries < MAX_RETRIES) {
 						try {
-							Response r = target.queryParam("serverSecret", serverSecret).request()
+							Response r = target.queryParam("serverSecret", serverSecret)
+									.queryParam("uri", serverURI).request()
 									.post(Entity.entity(operation, MediaType.APPLICATION_JSON));
 
 							if (r.getStatus() == Status.NO_CONTENT.getStatusCode()) {
@@ -1017,7 +1018,7 @@ public class SpreadsheetsRepResource implements RestRepSpreadsheets {
 				if (r.getStatus() == Status.OK.getStatusCode()) {
 					Operation[] operations = r.readEntity(Operation[].class);
 					for (Operation op : operations) {
-						operationBreaker(op);
+						operationBroker(op);
 					}
 
 					return true;
@@ -1035,8 +1036,8 @@ public class SpreadsheetsRepResource implements RestRepSpreadsheets {
 	}
 
 	@Override
-	public synchronized void executeOperation(Operation operation, String serverSecret) {
-		if (!serverSecret.equals(this.serverSecret)) {
+	public synchronized void executeOperation(Operation operation, String uri, String serverSecret) {
+		if (!serverSecret.equals(this.serverSecret) || !uri.equals(primaryURI)) {
 			throw new WebApplicationException(Status.FORBIDDEN);
 		}
 
@@ -1050,7 +1051,7 @@ public class SpreadsheetsRepResource implements RestRepSpreadsheets {
 		}
 
 		if (operation.getVersion() == repManager.getCurrentVersion() + 1) {
-			operationBreaker(operation);
+			operationBroker(operation);
 		} else {
 			// System.out.println(operation.getVersion());
 			// System.out.println(repManager.getCurrentVersion() + 1);
@@ -1071,7 +1072,7 @@ public class SpreadsheetsRepResource implements RestRepSpreadsheets {
 				if (r.getStatus() == Status.OK.getStatusCode()) {
 					Operation[] operations = r.readEntity(Operation[].class); // sera q e preciso usar gson?
 					for (Operation op : operations) {
-						operationBreaker(op);
+						operationBroker(op);
 					}
 				}
 
@@ -1144,7 +1145,7 @@ public class SpreadsheetsRepResource implements RestRepSpreadsheets {
 		return -1;
 	}
 
-	private void operationBreaker(Operation operation) {
+	private void operationBroker(Operation operation) {
 		String[] params = operation.getParams();
 		switch (operation.getOperation()) {
 			case CREATE:
