@@ -8,6 +8,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -75,6 +76,7 @@ public class SpreadsheetsRepResource implements RestRepSpreadsheets {
 	private Map<String, ValuesResult> cache = new HashMap<String, ValuesResult>();
 	private Map<String, Long> twServer = new HashMap<String, Long>();
 	private Map<String, Long> tc = new HashMap<String, Long>();
+	private List<String> replicas = new LinkedList<String>();
 	private Discovery discovery;
 	private ZookeeperProcessor zk;
 	private String domain, serverSecret, googleKey;
@@ -557,17 +559,20 @@ public class SpreadsheetsRepResource implements RestRepSpreadsheets {
 			public void process(WatchedEvent event) {
 				List<String> lst = zk.getChildren(path, this);
 				findPrimary(lst);
-				getMostRecentVersion(lst);
+				getMostRecentVersion();
 			}
 		});
 	}
 
 	private void findPrimary(List<String> lst) {
+		replicas = new LinkedList<>();
 		int minSeq = Integer.MAX_VALUE;
 		lst.stream().forEach(e -> {
 			int seqNum = Integer.parseInt(e.split("_")[1]);
+			String replicaURI = zk.getValue(String.format("/%s/%s", domain, e));
+			replicas.add(replicaURI);
 			if (seqNum < minSeq) {
-				primaryURI = zk.getValue(String.format("/%s/%s", domain, e));
+				primaryURI = replicaURI;
 				if (primaryURI.equals(serverURI)) {
 					isPrimary = true;
 				} else {
@@ -577,18 +582,17 @@ public class SpreadsheetsRepResource implements RestRepSpreadsheets {
 		});
 	}
 
-	private void getMostRecentVersion(List<String> lst) {
+	private void getMostRecentVersion() {
 		MostRecentVersion mostRecentVersion = new MostRecentVersion();
-		List<Thread> threads = new ArrayList<Thread>(lst.size());
-		lst.stream().forEach(e -> {
+		List<Thread> threads = new ArrayList<Thread>(replicas.size());
+		for(String replica : replicas) {
 			Thread thread = new Thread(() -> {
-				String currURI = zk.getValue(String.format("/%s/%s", domain, e));
-				int version = getReplicaCurrVersion(currURI);
-				mostRecentVersion.setHigherVersion(version, currURI);
+				int version = getReplicaCurrVersion(replica);
+				mostRecentVersion.setHigherVersion(version, replica);
 			});
 			threads.add(thread);
 			thread.start();
-		});
+		}
 
 		for (;;) {
 			boolean isRunning = false;
@@ -662,16 +666,14 @@ public class SpreadsheetsRepResource implements RestRepSpreadsheets {
 	}
 
 	private void handleRequest(Operation operation) {
-		List<String> lst = zk.getChildren(path);
 		AckCheck sendToSecondaries = new AckCheck();
-		List<Thread> threads = new ArrayList<Thread>(lst.size());
-		lst.stream().forEach(e -> {
+		List<Thread> threads = new ArrayList<Thread>(replicas.size());
+		for(String replica : replicas) {
 			Thread thread = new Thread(() -> {
-				String replicaURI = zk.getValue(String.format("/%s/%s", domain, e));
-				if (!replicaURI.equals(serverURI)) {
+				if (!replica.equals(serverURI)) {
 					int retries = 0;
 					boolean success = false;
-					WebTarget target = client.target(replicaURI).path(RestSpreadsheets.PATH).path("execute");
+					WebTarget target = client.target(replica).path(RestSpreadsheets.PATH).path("execute");
 
 					while (!success && retries < MAX_RETRIES) {
 						try {
@@ -696,7 +698,7 @@ public class SpreadsheetsRepResource implements RestRepSpreadsheets {
 			});
 			threads.add(thread);
 			thread.start();
-		});
+		}
 
 		while (!sendToSecondaries.hasSucceded()) {
 			boolean isRunning = false;
@@ -1167,5 +1169,4 @@ public class SpreadsheetsRepResource implements RestRepSpreadsheets {
 			throw new WebApplicationException(Status.FORBIDDEN); // 403
 		}
 	}
-	
 }                                                                             
